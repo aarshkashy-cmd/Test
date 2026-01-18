@@ -3,42 +3,38 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BOLTHEX | Admin Console</title>
+    <title>BOLTHEX | Admin</title>
     <style>
-        body { background: #050505; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .admin-card { background: #111; border: 1px solid #222; padding: 40px; border-radius: 20px; width: 350px; text-align: center; }
-        input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 8px; color: #fff; margin-bottom: 15px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #0ea5e9; border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; }
+        body { background: #000; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .login-card { background: #111; padding: 40px; border-radius: 15px; border: 1px solid #222; text-align: center; width: 320px; }
+        input { width: 100%; padding: 12px; margin: 20px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #0ea5e9; border: none; color: #fff; font-weight: bold; border-radius: 5px; cursor: pointer; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen" class="admin-card">
-        <h1 style="color:#0ea5e9">BOLTHEX</h1>
-        <p style="font-size: 0.8rem; color: #666;">ENTER GITHUB TOKEN</p>
-        <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxx">
-        <button onclick="unlock()">Unlock Dashboard</button>
+    <div id="login-screen" class="login-card">
+        <h1 style="color:#0ea5e9; margin:0;">BOLTHEX</h1>
+        <p style="color:#555; font-size:12px;">ADMIN CONSOLE</p>
+        <input type="password" id="token-input" placeholder="Paste GitHub Token">
+        <button onclick="unlock()">Unlock</button>
     </div>
 
-    <div id="nc-root"></div>
+    <script>
+        window.CMS_MANUAL_INIT = true;
+    </script>
 
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 
     <script>
-        // 2. This prevents the "collections must be unique" error
-        window.CMS_MANUAL_INIT = true;
-
         function unlock() {
             const token = document.getElementById('token-input').value.trim();
             if (!token) return alert("Please enter your token");
 
-            localStorage.setItem('bolthex_key', token);
-            
-            // Hide login UI
+            localStorage.setItem('bolthex_token', token);
             document.getElementById('login-screen').classList.add('hidden');
 
-            // 3. Initialize ONLY when button is clicked
             window.CMS.init({
                 config: {
                     backend: {
@@ -47,13 +43,12 @@
                         branch: "main",
                         token: token
                     },
-                    load_config_file: false, // Disables looking for config.yml
-                    display_url: "https://bolthex.in",
+                    load_config_file: false, // This stops the "Failed to load config.yml" error
                     media_folder: "photo",
                     public_folder: "photo",
                     collections: [{
                         name: "gallery",
-                        label: "Gallery Items",
+                        label: "Gallery",
                         folder: "photo",
                         create: true,
                         fields: [
@@ -65,9 +60,9 @@
             });
         }
 
-        // Auto-fill token if in browser memory
-        const saved = localStorage.getItem('bolthex_key');
-        if (saved) document.getElementById('token-input').value = saved;
+        // Auto-fill if token exists
+        const savedToken = localStorage.getItem('bolthex_token');
+        if (savedToken) document.getElementById('token-input').value = savedToken;
     </script>
 </body>
 </html>
