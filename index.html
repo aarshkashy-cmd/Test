@@ -6,244 +6,515 @@
     <title>BOLTHEX | Precision Engineering</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Plus+Jakarta+Sans:wght@200;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
+        /* --- DYNAMIC THEME ENGINE (SYSTEM PREFERENCE) --- */
         :root {
             --sky-blue: #0ea5e9;
-            --bg-dark: #000000;
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --transition-speed: 0.4s;
+            --bg-main: #020617;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(15, 23, 42, 0.6);
+            --glass-border: rgba(56, 189, 248, 0.2);
+            --glass-shadow: rgba(14, 165, 233, 0.15);
+            --screw-fill: rgba(15, 23, 42, 1);
+            --screw-stroke: rgba(56, 189, 248, 0.15);
+            --hex-opacity: 0.15;
+            --nav-bg: rgba(2, 6, 23, 0.85);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-main: #f0f9ff;
+                --text-main: #0f172a;
+                --text-muted: #475569;
+                --glass-bg: rgba(255, 255, 255, 0.7);
+                --glass-border: rgba(14, 165, 233, 0.3);
+                --glass-shadow: rgba(14, 165, 233, 0.1);
+                --screw-fill: rgba(255, 255, 255, 0.8);
+                --screw-stroke: rgba(2, 132, 199, 0.2);
+                --hex-opacity: 0.08;
+                --nav-bg: rgba(255, 255, 255, 0.85);
+            }
+        }
+
+        * { 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; cursor: none; 
+        }
+        
+        /* FIX: Robust Overflow Handling */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+            * { cursor: auto; }
+            .custom-cursor, .cursor-dot { display: none !important; }
+        }
 
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--bg-dark);
-            color: #ffffff;
-            overflow-x: hidden;
-            width: 100%;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
 
-        /* --- CHROMATIC INTRO --- */
-        #intro-overlay {
+        /* --- BG LAYERS --- */
+        .mesh-bg {
+            position: fixed; inset: 0; z-index: -5;
+            background: radial-gradient(circle at 60% 50%, rgba(14, 165, 233, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .side-screw-bg {
             position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 1.2s ease;
+            top: 50%;
+            left: -5%;
+            height: 110vh;
+            width: auto;
+            transform: translateY(-50%);
+            z-index: -4;
+            color: var(--sky-blue);
+            pointer-events: none;
+            filter: drop-shadow(10px 10px 20px rgba(0,0,0,0.2));
+            transition: opacity 0.5s ease;
+            will-change: transform;
         }
 
-        .brand-text {
-            font-size: clamp(35px, 10vw, 90px);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            position: relative;
-            text-transform: uppercase;
-            animation: cinematicReveal 3.5s forwards;
+        /* FIX: Mobile Scaling for Screw */
+        @media (max-width: 768px) {
+            .side-screw-bg {
+                left: -25%; /* Move further left on mobile */
+                height: 90vh; /* Slightly smaller */
+                opacity: 0.3; /* Fade it out so text is readable */
+            }
+        }
+        
+        .screw-path-fill { fill: var(--screw-fill); transition: fill 0.5s ease; }
+        .screw-path-stroke { stroke: var(--screw-stroke); stroke-width: 1.5; vector-effect: non-scaling-stroke; transition: stroke 0.5s ease; }
+
+        .screw-threads-bg {
+            position: fixed; inset: 0; z-index: -3;
+            background: repeating-linear-gradient(-45deg, transparent, transparent 40px, rgba(14, 165, 233, 0.03) 40px, rgba(14, 165, 233, 0.03) 41px);
+            pointer-events: none;
         }
 
-        .brand-text::before, .brand-text::after {
-            content: "BOLTHEX";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+        .floating-hex {
+            position: fixed; z-index: -2; color: var(--sky-blue);
+            opacity: 0; pointer-events: none;
+            animation: floatUpRotate 25s linear infinite;
         }
-        .brand-text::before { color: #ff0000; z-index: -1; animation: shiftRed 3.5s forwards; opacity: 0.5; }
-        .brand-text::after { color: #0000ff; z-index: -2; animation: shiftBlue 3.5s forwards; opacity: 0.5; }
-
-        @keyframes cinematicReveal {
-            0% { opacity: 0; filter: blur(20px); transform: scale(0.9); }
-            100% { opacity: 1; filter: blur(0px); transform: scale(1); }
+        @keyframes floatUpRotate {
+            0% { transform: translateY(110vh) rotate(0deg) scale(0.8); opacity: 0; }
+            15% { opacity: var(--hex-opacity); }
+            85% { opacity: var(--hex-opacity); }
+            100% { transform: translateY(-20vh) rotate(360deg) scale(1.2); opacity: 0; }
         }
-        @keyframes shiftRed { 0% { transform: translate(10px, 4px); } 100% { transform: translate(0, 0); opacity: 0; } }
-        @keyframes shiftBlue { 0% { transform: translate(-10px, -4px); } 100% { transform: translate(0, 0); opacity: 0; } }
 
-        /* --- APPLE GLASS NAV --- */
+        /* --- UI COMPONENTS --- */
+        .nav-link.active { color: var(--sky-blue); text-shadow: 0 0 15px var(--sky-blue); }
+        
         .glass-nav {
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: saturate(180%) blur(20px);
-            -webkit-backdrop-filter: saturate(180%) blur(20px);
-            border-bottom: 1px solid var(--glass-border);
+            background: var(--nav-bg); backdrop-filter: blur(12px); 
+            border-bottom: 1px solid var(--glass-border); transition: 0.3s;
         }
+        .glass-nav.scrolled { border-bottom-color: var(--sky-blue); }
 
         .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            border-radius: clamp(16px, 4vw, 24px);
-            transition: 0.4s cubic-bezier(0.15, 0, 0.15, 1);
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 20px; box-shadow: 0 4px 30px var(--glass-shadow);
+            transition: 0.4s;
+        }
+        .glass-card:hover { border-color: var(--sky-blue); transform: translateY(-5px); }
+
+        #intro-overlay {
+            position: fixed; inset: 0; z-index: 10000;
+            background: var(--bg-main);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 1.2s ease;
+        }
+        .brand-text {
+            font-size: clamp(40px, 12vw, 100px); font-weight: 800; letter-spacing: 0.05em;
+            position: relative; animation: cinematicReveal 3.5s forwards; color: var(--text-main);
+        }
+        .brand-text::before { content: "BOLTHEX"; position: absolute; inset: 0; color: var(--sky-blue); z-index: -1; animation: shiftCyan 3.5s forwards; opacity: 0.6; }
+        
+        @keyframes cinematicReveal { 0% { opacity: 0; filter: blur(30px); transform: scale(0.9); } 100% { opacity: 1; filter: blur(0); transform: scale(1); } }
+        @keyframes shiftCyan { 0% { transform: translate(4px, 2px); } 100% { transform: translate(0, 0); opacity: 0; } }
+
+        .custom-cursor {
+            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
+            border: 1px solid var(--sky-blue); border-radius: 50%; pointer-events: none; z-index: 9999;
+            transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s;
+            mix-blend-mode: difference;
+        }
+        .cursor-dot {
+            position: fixed; top: 0; left: 0; width: 4px; height: 4px;
+            background: var(--sky-blue); border-radius: 50%; pointer-events: none; z-index: 10001;
+            transform: translate(-50%, -50%);
+        }
+        body.hovering .custom-cursor { width: 50px; height: 50px; background: rgba(14, 165, 233, 0.1); }
+
+        /* --- LAYOUT & TRANSITIONS --- */
+        /* FIX: Responsive Padding */
+        .page-view { 
+            display: none; width: 100%; min-height: 100vh; 
+            padding: 120px 6% 80px; 
+            opacity: 0; /* Default invisible for fade in */
+        }
+        
+        @media (max-width: 768px) {
+            .page-view { padding: 100px 5% 60px; }
+            h1 { font-size: 2.5rem !important; } /* Force readable title on mobile */
         }
 
-        /* --- RESPONSIVE PAGE VIEWS --- */
-        .page-view { display: none; width: 100%; min-height: 100vh; padding: 100px 6% 60px; }
-        .page-view.active { display: block; animation: appleFade 0.6s ease forwards; }
-
-        @keyframes appleFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- DYNAMIC GALLERY --- */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-            gap: 15px;
+        /* FIX: Smoother Entry/Exit Animations */
+        .page-view.active { 
+            display: block; 
+            animation: fadeUpEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+        }
+        
+        .page-view.exiting {
+            display: block;
+            pointer-events: none;
+            animation: fadeDownExit 0.4s cubic-bezier(0.7, 0, 0.84, 0) forwards;
         }
 
-        .gallery-item {
-            position: relative;
-            border-radius: 12px;
-            overflow: hidden;
-            aspect-ratio: 1/1;
-            cursor: pointer;
+        @keyframes fadeUpEnter { 
+            from { opacity: 0; transform: translateY(30px) scale(0.98); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
         }
 
-        .gallery-item img {
-            width: 100%; height: 100%; object-fit: cover;
-            transition: transform 0.6s ease;
+        @keyframes fadeDownExit { 
+            from { opacity: 1; transform: translateY(0); } 
+            to { opacity: 0; transform: translateY(-20px); } 
         }
 
-        @media (hover: hover) {
-            .gallery-item:hover img { transform: scale(1.08); }
+        .text-gradient-flow {
+            background: linear-gradient(120deg, var(--text-main) 0%, var(--sky-blue) 40%, #7dd3fc 60%, var(--text-main) 100%);
+            background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shine 6s linear infinite;
         }
+        @keyframes shine { to { background-position: 200% center; } }
+        
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .gallery-item { aspect-ratio: 1; overflow: hidden; border-radius: 16px; background: var(--glass-bg); }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
+        .gallery-item:hover img { transform: scale(1.1); }
+        
+        .cta-button { 
+            border: 1px solid var(--sky-blue); color: var(--sky-blue); transition: 0.3s; 
+            background: rgba(14, 165, 233, 0.05); position: relative; overflow: hidden;
+        }
+        .cta-button:hover { background: var(--sky-blue); color: #fff; box-shadow: 0 0 20px rgba(14, 165, 233, 0.4); }
 
-        /* --- WHATSAPP --- */
-        .wa-float {
-            position: fixed; bottom: 25px; right: 25px;
-            background: #25D366; width: 55px; height: 55px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            z-index: 5000; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-            transition: transform 0.3s ease;
-        }
-        .wa-float:active { transform: scale(0.9); }
+        .spinner { border: 3px solid rgba(14,165,233,0.2); border-top: 3px solid var(--sky-blue); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 40px auto; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* --- MESH BG --- */
-        .mesh-bg {
-            position: fixed; inset: 0; z-index: -1;
-            background: 
-                radial-gradient(circle at 15% 15%, rgba(14, 165, 233, 0.12) 0%, transparent 45%),
-                radial-gradient(circle at 85% 85%, rgba(14, 165, 233, 0.08) 0%, transparent 45%);
-        }
     </style>
 </head>
 <body>
 
+    <div class="custom-cursor"></div>
+    <div class="cursor-dot"></div>
+    
     <div class="mesh-bg"></div>
+    
+    <svg id="parallax-screw" class="side-screw-bg" viewBox="0 0 150 500" preserveAspectRatio="xMidYMid meet">
+        <path class="screw-path-fill screw-path-stroke" d="M10 20 L130 20 L145 60 L130 100 L10 100 L0 60 Z"/>
+        <line class="screw-path-stroke" x1="0" y1="60" x2="145" y2="60" />
+        <rect class="screw-path-fill screw-path-stroke" x="35" y="100" width="75" height="380" />
+        <path class="screw-path-stroke" d="M35 130 L110 160 M35 160 L110 190 M35 190 L110 220 M35 220 L110 250 M35 250 L110 280 M35 280 L110 310 M35 310 L110 340 M35 340 L110 370 M35 370 L110 400 M35 400 L110 430" fill="none"/>
+    </svg>
+
+    <div class="screw-threads-bg"></div>
+    <div id="hex-container"></div> 
 
     <div id="intro-overlay">
         <h1 class="brand-text">BOLTHEX</h1>
+        <p class="mt-4 text-sky-500 uppercase tracking-[0.3em] text-xs opacity-0 animate-[fadeUp_1s_1.5s_forwards]">Precision Engineering</p>
     </div>
 
-    <a href="https://wa.me/918281505931" target="_blank" class="wa-float" aria-label="Chat on WhatsApp">
-        <svg width="32" height="32" viewBox="0 0 448 512" fill="white">
-            <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-5.5-2.8-23.2-8.5-44.2-27.3-16.4-14.6-27.4-32.7-30.6-38.2-3.2-5.6-.3-8.6 2.4-11.3 2.5-2.5 5.5-6.5 8.3-9.8 2.8-3.2 3.7-5.5 5.5-9.3 1.9-3.7 1-6.9-.5-9.8-1.5-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 13.2 5.7 23.5 9.2 31.6 11.8 13.3 4.2 25.4 3.6 35 2.2 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+    <a href="https://wa.me/918281505931" target="_blank" class="fixed bottom-8 right-8 z-[5000] w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center hoverable shadow-lg hover:scale-110 transition-transform duration-300 group">
+        <svg width="28" height="28" viewBox="0 0 448 512" fill="white" class="group-hover:rotate-12 transition-transform">
+            <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6z"/>
         </svg>
     </a>
 
-    <nav class="fixed top-0 w-full z-[4000] py-4 px-5 md:px-12 glass-nav flex justify-between items-center">
-        <div class="text-lg md:text-xl font-bold tracking-tighter cursor-pointer" onclick="navigate('home')">BOLT<span class="text-sky-500">HEX</span></div>
-        <div class="flex space-x-5 md:space-x-10 text-[9px] md:text-[10px] font-bold uppercase tracking-widest opacity-80">
-            <span class="cursor-pointer hover:text-sky-500" onclick="navigate('gallery')">Gallery</span>
-            <span class="cursor-pointer hover:text-sky-500" onclick="navigate('about')">About</span>
-            <span class="cursor-pointer hover:text-sky-500" onclick="navigate('contact')">Contact</span>
+    <nav id="navbar" class="fixed top-0 w-full z-[4000] py-5 px-6 md:px-14 glass-nav flex justify-between items-center">
+        <div class="text-xl md:text-2xl font-bold tracking-tight hoverable cursor-pointer" onclick="navigate('home')">
+            BOLT<span class="text-sky-500">HEX</span>
+        </div>
+        <div class="flex space-x-6 md:space-x-12 text-[10px] md:text-[11px] font-semibold uppercase tracking-widest">
+            <span class="nav-link active hoverable cursor-pointer" data-page="home" onclick="navigate('home')">Home</span>
+            <span class="nav-link hoverable cursor-pointer" data-page="gallery" onclick="navigate('gallery')">Gallery</span>
+            <span class="nav-link hoverable cursor-pointer" data-page="about" onclick="navigate('about')">About</span>
+            <span class="nav-link hoverable cursor-pointer" data-page="contact" onclick="navigate('contact')">Contact</span>
         </div>
     </nav>
 
     <main id="home-view" class="page-view active">
-        <div class="max-w-5xl mx-auto flex flex-col items-center justify-center min-h-[65vh] text-center">
-            <h2 class="text-sky-500 text-[9px] tracking-[0.8em] uppercase mb-4" data-aos="fade-up">Arancherry Kerala</h2>
-            <h1 class="text-4xl md:text-7xl font-bold mb-8 leading-[1.1]" data-aos="fade-up" data-aos-delay="150">Precision <br><span class="italic font-light text-sky-500">Fastening.</span></h1>
-            <button onclick="navigate('gallery')" class="glass-card px-8 py-3 text-[10px] uppercase tracking-widest">Explore Collection</button>
+        <div class="parallax-content max-w-6xl mx-auto flex flex-col items-center md:items-end justify-center min-h-[70vh] text-center md:text-right relative z-10 pt-20">
+            <h2 class="text-sky-500 text-xs tracking-[0.6em] uppercase mb-8" data-aos="fade-down">Arancherry, Kerala</h2>
+            
+            <h1 class="text-5xl md:text-8xl font-black mb-8 leading-tight" data-aos="fade-left" data-aos-delay="100">
+                ENGINEERED<br>
+                <span class="text-gradient-flow italic font-light">PERFECTION</span>
+            </h1>
+            
+            <p class="text-muted text-base md:text-lg max-w-xl mb-12 leading-relaxed" style="color:var(--text-muted)" data-aos="fade-left" data-aos-delay="200">
+                Premium fastening solutions forging the gap between industrial strength and architectural elegance.
+            </p>
+            
+            <button onclick="navigate('gallery')" class="cta-button px-10 py-4 text-xs font-bold uppercase tracking-widest hoverable" data-aos="fade-left" data-aos-delay="300">
+                View Collection
+            </button>
+        </div>
+
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 mt-10 relative z-10 pl-0 md:pl-20" data-aos="fade-up" data-aos-delay="400">
+            <div class="glass-card p-8 flex flex-col items-center hoverable">
+                <span class="text-4xl font-bold text-sky-400 mb-2">500+</span>
+                <span class="text-xs uppercase tracking-widest text-gray-500">Units</span>
+            </div>
+            <div class="glass-card p-8 flex flex-col items-center hoverable">
+                <span class="text-4xl font-bold text-sky-400 mb-2">15Y</span>
+                <span class="text-xs uppercase tracking-widest text-gray-500">Experience</span>
+            </div>
+            <div class="glass-card p-8 flex flex-col items-center hoverable">
+                <span class="text-4xl font-bold text-sky-400 mb-2">100%</span>
+                <span class="text-xs uppercase tracking-widest text-gray-500">Quality</span>
+            </div>
         </div>
     </main>
 
     <section id="gallery-view" class="page-view">
-        <div class="max-w-7xl mx-auto">
-            <h2 class="text-3xl md:text-5xl font-bold mb-10">Portfolio</h2>
+        <div class="max-w-7xl mx-auto pl-0 md:pl-10">
+            <div class="mb-12 text-center md:text-left" data-aos="fade-down">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Product Catalogue</h2>
+                <div class="h-1 w-20 bg-sky-500 md:mx-0 mx-auto"></div>
+            </div>
             <div id="dynamic-gallery" class="gallery-grid">
-                </div>
+                <div class="spinner"></div>
+            </div>
         </div>
     </section>
 
     <section id="about-view" class="page-view">
-        <div class="max-w-4xl mx-auto">
-            <div class="glass-card p-8 md:p-16">
-                <h2 class="text-3xl font-bold mb-6 text-sky-500">Our Story</h2>
-                <p class="text-lg md:text-xl font-light leading-relaxed opacity-80 mb-6">Based in Kakkoor, Kerala, Bolthex is a leader in premium engineering fasteners.</p>
-                <p class="text-lg md:text-xl font-light leading-relaxed opacity-80">We combine architectural beauty with structural integrity.</p>
+        <div class="max-w-5xl mx-auto pl-0 md:pl-10">
+            <div class="glass-card p-10 md:p-16 relative overflow-hidden" data-aos="fade-up">
+                <h2 class="text-4xl font-bold mb-8">The Bolthex Standard</h2>
+                <div class="space-y-6 leading-loose text-lg font-light" style="color:var(--text-muted)">
+                    <p>
+                        Nestled in <span class="text-sky-400 font-normal">Kakkoor, Kerala</span>, Bolthex isn't just a supplier; we are the structural backbone of countless engineering marvels. 
+                    </p>
+                    <p>
+                        We understand that a single bolt can define the integrity of an entire structure. That is why our inventory is curated for absolute precision.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12 pt-12 border-t border-sky-900/20">
+                    <div>
+                        <h3 class="text-sky-400 font-semibold mb-2">Precision</h3>
+                        <p class="text-sm text-gray-500">Micro-tolerance manufacturing.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-sky-400 font-semibold mb-2">Logistics</h3>
+                        <p class="text-sm text-gray-500">Rapid regional deployment.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <section id="contact-view" class="page-view">
-        <div class="max-w-4xl mx-auto text-center">
-            <div class="glass-card p-10 md:p-20">
-                <p class="text-sky-500 text-[10px] tracking-widest uppercase mb-6">Inquiry</p>
-                <h1 class="text-3xl md:text-5xl font-bold mb-10">+91 82815 05931</h1>
-                <p class="text-lg opacity-60 leading-relaxed">Arancherry Arcade, Kakkoor P.O, <br>Kerala 686662</p>
+        <div class="max-w-4xl mx-auto text-center pt-10">
+            <div class="glass-card p-12 md:p-20 hoverable" data-aos="zoom-in">
+                <span class="text-sky-500 text-xs tracking-[0.4em] uppercase font-bold">Inquiries</span>
+                <h2 class="text-5xl md:text-7xl font-bold mt-6 mb-10">Start a Project</h2>
+                <a href="tel:+918281505931" class="inline-block text-3xl md:text-4xl font-light hover:text-sky-400 transition-colors mb-12">
+                    +91 82815 05931
+                </a>
+                <div class="text-sm tracking-wide text-gray-500">
+                    <p>Arancherry Arcade, Kakkoor P.O</p>
+                    <p>Kerala 686662</p>
+                </div>
             </div>
         </div>
     </section>
 
     <div id="lightbox" class="fixed inset-0 z-[6000] bg-black/95 hidden items-center justify-center p-4" onclick="this.style.display='none'">
-        <img id="l-img" src="" class="max-w-full max-h-full rounded shadow-2xl border border-white/10">
+        <button class="absolute top-8 right-8 text-white text-5xl hover:text-sky-500 transition-colors hoverable">&times;</button>
+        <img id="l-img" src="" class="max-w-full max-h-[90vh] rounded-lg shadow-2xl border border-sky-900">
     </div>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // Initialize AOS
-        AOS.init({ duration: 800, once: true });
+        // --- IMPROVED PARALLAX SCROLL ENGINE ---
+        window.addEventListener('scroll', () => {
+            const screw = document.getElementById('parallax-screw');
+            const scrollY = window.scrollY;
+            
+            // 1. Enhanced Screw Movement (More dynamic)
+            // Move left stronger, Move Up, AND Rotate
+            const moveX = -(scrollY * 0.25); // Increased multiplier
+            const moveY = -50 + (scrollY * 0.08); 
+            const rotate = scrollY * 0.1; // Screw turns as you scroll
+            
+            screw.style.transform = `translate(calc(-5% + ${moveX}px), ${moveY}%) rotate(-${rotate}deg)`;
+            
+            // 2. Parallax Text Effect (Opposite direction to create depth)
+            // Only applies on Home View to prevent layout breaks elsewhere
+            const homeContent = document.querySelector('.parallax-content');
+            if(homeContent && document.getElementById('home-view').classList.contains('active')) {
+                // Text moves slightly down and right as screw moves up and left
+                homeContent.style.transform = `translateY(${scrollY * 0.1}px) translateX(${scrollY * 0.02}px)`; 
+                homeContent.style.opacity = 1 - (scrollY / 700); // Fade out slightly on scroll
+            }
+        });
 
-        // Navigation Logic
+        // --- FLOATING BOLTS ---
+        function createFloatingBolts() {
+            const container = document.getElementById('hex-container');
+            const numBolts = 10; 
+            for(let i=0; i<numBolts; i++) {
+                const div = document.createElement('div');
+                div.classList.add('floating-hex');
+                div.innerHTML = `
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                        <path d="M12 2L2 8l0 8l10 6l10-6l0-8z" />
+                        <circle cx="12" cy="12" r="4" stroke-width="0.5"/>
+                    </svg>`;
+                div.style.left = Math.random() * 90 + 5 + 'vw';
+                div.style.animationDuration = (18 + Math.random() * 20) + 's';
+                div.style.animationDelay = (Math.random() * -20) + 's';
+                div.style.transform = `scale(${0.6 + Math.random() * 0.8})`;
+                container.appendChild(div);
+            }
+        }
+        createFloatingBolts();
+
+        // --- CURSOR ---
+        const cursor = document.querySelector('.custom-cursor');
+        const cursorDot = document.querySelector('.cursor-dot');
+        let mouseX = -100, mouseY = -100;
+        let cursorX = -100, cursorY = -100;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursorDot.style.left = mouseX + 'px';
+            cursorDot.style.top = mouseY + 'px';
+        });
+
+        function animateCursor() {
+            let distX = mouseX - cursorX;
+            let distY = mouseY - cursorY;
+            cursorX += distX * 0.15;
+            cursorY += distY * 0.15;
+            cursor.style.left = cursorX + 'px';
+            cursor.style.top = cursorY + 'px';
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // --- INTERACTION ---
+        const hoverables = document.querySelectorAll('.hoverable, a, button, .nav-link');
+        hoverables.forEach(el => {
+            el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+            el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+        });
+
+        // --- INIT & NAV (IMPROVED TRANSITIONS) ---
+        AOS.init({ duration: 800, once: true, offset: 50 });
+
         function navigate(id) {
-            document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
-            document.getElementById(id + '-view').classList.add('active');
+            // Scroll top immediately
             window.scrollTo({top: 0, behavior: 'smooth'});
+            
+            // Update Nav Links
+            document.querySelectorAll('.nav-link').forEach(l => {
+                l.classList.remove('active');
+                if(l.dataset.page === id) l.classList.add('active');
+            });
+
+            // Handle View Transition
+            const currentView = document.querySelector('.page-view.active');
+            const nextView = document.getElementById(id + '-view');
+
+            if (currentView && currentView !== nextView) {
+                // Trigger Exit Animation
+                currentView.classList.remove('active');
+                currentView.classList.add('exiting');
+                
+                // Wait for exit animation to finish before showing next
+                setTimeout(() => {
+                    currentView.classList.remove('exiting');
+                    currentView.style.display = 'none';
+                    
+                    if (nextView) {
+                        nextView.style.display = 'block';
+                        // Small delay to allow display:block to render before adding active class (triggers CSS animation)
+                        setTimeout(() => nextView.classList.add('active'), 50);
+                    }
+                    AOS.refresh();
+                }, 400); // Matches CSS fadeDownExit duration
+            } else if (!currentView && nextView) {
+                // Initial load or edge case
+                nextView.style.display = 'block';
+                setTimeout(() => nextView.classList.add('active'), 50);
+            }
         }
 
-        // Lightbox Logic
         function openLightbox(el) {
-            const img = el.querySelector('img').src;
-            document.getElementById('l-img').src = img;
+            const src = el.querySelector('img').src;
+            document.getElementById('l-img').src = src;
             document.getElementById('lightbox').style.display = 'flex';
         }
 
-        // Intro Overlay Removal
+        window.addEventListener('scroll', () => {
+            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+        });
+
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const intro = document.getElementById('intro-overlay');
                 intro.style.opacity = '0';
-                setTimeout(() => { intro.style.display = 'none'; }, 1000);
+                setTimeout(() => { 
+                    intro.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }, 1200);
             }, 3000);
         });
 
-        // --- MERGED GITHUB GALLERY LOGIC ---
+        // --- GALLERY ---
         const container = document.getElementById('dynamic-gallery');
-
         fetch('https://api.github.com/repos/aarshkashy-cmd/Test/contents/photo')
             .then(res => res.json())
             .then(files => {
+                container.innerHTML = '';
                 if(!Array.isArray(files)) return;
-                
-                files.forEach(file => {
-                    // Filter for image files
-                    if (file.name.match(/\.(jpg|jpeg|png|webp|gif)$/i)) {
+                files.forEach((file, index) => {
+                    if (file.name.match(/\.(jpg|jpeg|png|webp)$/i)) {
                         const div = document.createElement('div');
-                        div.className = 'gallery-item glass-card p-1';
+                        div.className = 'gallery-item hoverable';
+                        div.setAttribute('data-aos', 'fade-up');
                         div.onclick = function() { openLightbox(this); };
-                        
-                        // Using download_url for direct GitHub CDN access
-                        div.innerHTML = `<img src="${file.download_url}" alt="Bolthex Fastener" loading="lazy">`;
+                        div.innerHTML = `<img src="${file.download_url}" alt="Product" loading="lazy">`;
+                        div.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+                        div.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
                         container.appendChild(div);
                     }
                 });
             })
-            .catch(err => {
-                console.error("Could not load gallery:", err);
-                container.innerHTML = `<p class="text-center opacity-50 col-span-full">Gallery temporarily unavailable.</p>`;
+            .catch(e => {
+                container.innerHTML = `<div class="text-gray-500 col-span-full py-10">Gallery loading...</div>`;
             });
+
+        document.body.style.overflow = 'hidden';
     </script>
 </body>
 </html>
