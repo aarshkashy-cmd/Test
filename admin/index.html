@@ -1,0 +1,18 @@
+backend:
+  name: github
+  repo: your-username/your-repo-name # Example: aarshkashy-cmd/bolthex
+  branch: main
+
+media_folder: "photo" # Where images will be saved
+public_folder: "photo"
+
+collections:
+  - name: "settings"
+    label: "Site Settings"
+    files:
+      - file: "index.html"
+        label: "Homepage Content"
+        name: "home"
+        fields:
+          - {label: "Phone Number", name: "phone", widget: "string"}
+          - {label: "Address", name: "address", widget: "text"}
