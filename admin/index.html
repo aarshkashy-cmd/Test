@@ -1,18 +1,49 @@
-backend:
-  name: github
-  repo: your-username/your-repo-name # Example: aarshkashy-cmd/bolthex
-  branch: main
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BOLTHEX | Secure Admin</title>
+    <style>
+        body { background: #000; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        #lock-screen { text-align: center; }
+        input { padding: 10px; border-radius: 5px; border: 1px solid #333; background: #111; color: white; margin-top: 10px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
 
-media_folder: "photo" # Where images will be saved
-public_folder: "photo"
+    <div id="lock-screen">
+        <h1>BOLTHEX ADMIN</h1>
+        <p>Enter Master Key to Access</p>
+        <input type="password" id="pass-input" placeholder="Password...">
+        <button onclick="checkPass()" style="padding: 10px 20px; cursor: pointer;">Login</button>
+        <p id="error" style="color: red;"></p>
+    </div>
 
-collections:
-  - name: "settings"
-    label: "Site Settings"
-    files:
-      - file: "index.html"
-        label: "Homepage Content"
-        name: "home"
-        fields:
-          - {label: "Phone Number", name: "phone", widget: "string"}
-          - {label: "Address", name: "address", widget: "text"}
+    <div id="cms-container" class="hidden">
+        <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    </div>
+
+    <script>
+        const MASTER_KEY = "bolthex2026"; // <--- CHANGE YOUR PASSWORD HERE
+
+        function checkPass() {
+            const input = document.getElementById('pass-input').value;
+            if (input === MASTER_KEY) {
+                document.getElementById('lock-screen').classList.add('hidden');
+                document.getElementById('cms-container').classList.remove('hidden');
+                // Initialize Decap CMS after successful login
+                initCMS();
+            } else {
+                document.getElementById('error').innerText = "Incorrect Key";
+            }
+        }
+
+        // Allow "Enter" key to submit
+        document.getElementById('pass-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') checkPass();
+        });
+    </script>
+</body>
+</html>
