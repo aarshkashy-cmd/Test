@@ -1,76 +1,70 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8" />
-    <title>BOLTHEX | Private Admin</title>
+    <title>BOLTHEX | Upload</title>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .login-card { background: #111; padding: 40px; border-radius: 15px; border: 1px solid #222; text-align: center; width: 320px; }
-        input { width: 100%; padding: 12px; margin: 20px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #0ea5e9; border: none; color: #fff; font-weight: bold; border-radius: 5px; cursor: pointer; }
-        .hidden { display: none; }
+        body { background: #000; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .card { background: #111; padding: 30px; border-radius: 12px; border: 1px solid #333; width: 320px; text-align: center; }
+        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #333; box-sizing: border-box; }
+        input { background: #000; color: #fff; }
+        button { background: #0ea5e9; color: white; border: none; cursor: pointer; font-weight: bold; }
+        #status { font-size: 12px; margin-top: 10px; color: #888; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen" class="login-card">
-        <h1 style="color:#0ea5e9; margin:0;">BOLTHEX</h1>
-        <p style="color:#555; font-size:12px;">DIRECT GITHUB ACCESS</p>
-        <input type="password" id="token-input" placeholder="Paste ghp_ Token Here">
-        <button onclick="unlock()">Login to Gallery</button>
-    </div>
+<div class="card">
+    <h2>BOLTHEX UPLOAD</h2>
+    <input type="password" id="token" placeholder="GitHub Token">
+    <input type="file" id="fileInput" accept="image/*">
+    <button onclick="uploadFile()">Upload to Gallery</button>
+    <div id="status"></div>
+</div>
 
-    <div id="nc-root"></div>
+<script>
+    // Remember token
+    const savedToken = localStorage.getItem('bt_token');
+    if (savedToken) document.getElementById('token').value = savedToken;
 
-    <script>
-        // Stop the CMS from looking for Netlify or config.yml automatically
-        window.CMS_MANUAL_INIT = true;
-    </script>
+    async function uploadFile() {
+        const token = document.getElementById('token').value;
+        const fileInput = document.getElementById('fileInput');
+        const status = document.getElementById('status');
+        
+        if (!fileInput.files[0] || !token) return alert("Select file and enter token");
+        
+        localStorage.setItem('bt_token', token);
+        status.innerText = "Uploading...";
 
-    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = async () => {
+            const content = reader.result.split(',')[1];
+            const fileName = `bolt_${Date.now()}.jpg`; // Unique name
+            const url = `https://api.github.com/repos/aarshkashy-cmd/Test/contents/photo/${fileName}`;
 
-    <script>
-        function unlock() {
-            const token = document.getElementById('token-input').value.trim();
-            if (!token) return alert("Please enter your GitHub Token");
-
-            // Save for next time
-            localStorage.setItem('bolthex_token', token);
-            
-            // Hide our custom login card
-            document.getElementById('login-screen').classList.add('hidden');
-
-            // Initialize the CMS with the token HARD-CODED into the session
-            window.CMS.init({
-                config: {
-                    backend: {
-                        name: "github",
-                        repo: "aarshkashy-cmd/Test",
-                        branch: "main",
-                        token: token, // This skips the "Login with GitHub" button
-                        use_graphql: false 
-                    },
-                    load_config_file: false,
-                    display_url: "https://bolthex.in",
-                    media_folder: "photo",
-                    public_folder: "photo",
-                    collections: [{
-                        name: "gallery",
-                        label: "Gallery Manager",
-                        folder: "photo",
-                        create: true,
-                        fields: [
-                            {label: "Title", name: "title", widget: "string"},
-                            {label: "Image", name: "image", widget: "image"}
-                        ]
-                    }]
-                }
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: `Upload ${fileName}`,
+                    content: content
+                })
             });
-        }
 
-        // Auto-fill the box if we have the key saved
-        const saved = localStorage.getItem('bolthex_token');
-        if (saved) document.getElementById('token-input').value = saved;
-    </script>
+            if (response.ok) {
+                status.innerText = "Success! Photo added.";
+                fileInput.value = "";
+            } else {
+                status.innerText = "Error. Check token permissions.";
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+</script>
 </body>
 </html>
