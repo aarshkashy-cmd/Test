@@ -2,52 +2,58 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>BOLTHEX Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BOLTHEX | Admin Console</title>
     <style>
-        body { background: #000; color: #0ea5e9; font-family: sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: #111; padding: 30px; border-radius: 15px; border: 1px solid #222; text-align: center; }
-        input { padding: 12px; width: 300px; border-radius: 5px; border: 1px solid #333; background: #000; color: white; margin: 15px 0; display: block; }
-        button { background: #0ea5e9; color: white; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        body { background: #050505; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .admin-card { background: #111; border: 1px solid #222; padding: 40px; border-radius: 20px; width: 350px; text-align: center; }
+        input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 8px; color: #fff; margin-bottom: 15px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #0ea5e9; border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="login-gate" class="box">
-        <h2>BOLTHEX CMS</h2>
-        <p style="color: #666; font-size: 0.8rem;">Enter GitHub Personal Access Token</p>
+    <div id="login-screen" class="admin-card">
+        <h1 style="color:#0ea5e9">BOLTHEX</h1>
+        <p style="font-size: 0.8rem; color: #666;">ENTER GITHUB TOKEN</p>
         <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxx">
-        <button onclick="startAdmin()">Unlock Dashboard</button>
+        <button onclick="unlock()">Unlock Dashboard</button>
     </div>
 
-    <div id="cms-container" class="hidden"></div>
+    <div id="nc-root"></div>
 
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+
     <script>
-        function startAdmin() {
-            const token = document.getElementById('token-input').value;
-            if (!token) return alert("Please enter a token");
+        // 2. This prevents the "collections must be unique" error
+        window.CMS_MANUAL_INIT = true;
 
-            // Save token to local storage so you don't have to type it every single time
-            localStorage.setItem('gh_token', token);
+        function unlock() {
+            const token = document.getElementById('token-input').value.trim();
+            if (!token) return alert("Please enter your token");
+
+            localStorage.setItem('bolthex_key', token);
             
-            document.getElementById('login-gate').style.display = 'none';
-            document.getElementById('cms-container').classList.remove('hidden');
+            // Hide login UI
+            document.getElementById('login-screen').classList.add('hidden');
 
-            // Initialize the CMS with the token you just typed
+            // 3. Initialize ONLY when button is clicked
             window.CMS.init({
                 config: {
                     backend: {
                         name: "github",
                         repo: "aarshkashy-cmd/Test",
                         branch: "main",
-                        token: token // Uses your input as the password
+                        token: token
                     },
+                    load_config_file: false, // Disables looking for config.yml
+                    display_url: "https://bolthex.in",
                     media_folder: "photo",
                     public_folder: "photo",
                     collections: [{
                         name: "gallery",
-                        label: "Gallery",
+                        label: "Gallery Items",
                         folder: "photo",
                         create: true,
                         fields: [
@@ -59,11 +65,9 @@
             });
         }
 
-        // Auto-login if token is already in browser memory
-        const savedToken = localStorage.getItem('gh_token');
-        if (savedToken) {
-            document.getElementById('token-input').value = savedToken;
-        }
+        // Auto-fill token if in browser memory
+        const saved = localStorage.getItem('bolthex_key');
+        if (saved) document.getElementById('token-input').value = saved;
     </script>
 </body>
 </html>
