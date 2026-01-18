@@ -1,45 +1,126 @@
-<script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOLTHEX | Engineering & Industrial Supplies</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #050505; color: white; font-family: sans-serif; }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .gallery-item {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        .gallery-item:hover { transform: translateY(-5px); border-color: #0ea5e9; }
+        .gallery-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+        .glass-nav {
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            border-bottom: 1px solid #222;
+        }
+    </style>
+</head>
+<body>
 
-<script>
-    // 1. This line is CRITICAL. It stops the "Double Loading" error.
-    window.CMS_MANUAL_INIT = true; 
+    <nav class="glass-nav p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold tracking-tighter text-sky-500">BOLT<span class="text-white font-light">HEX</span></h1>
+            <div class="space-x-6 text-sm uppercase tracking-widest">
+                <a href="#gallery" class="hover:text-sky-400">Products</a>
+                <a href="admin/index.html" class="bg-sky-600 px-4 py-2 rounded-md hover:bg-sky-700">Admin Login</a>
+            </div>
+        </div>
+    </nav>
 
-    function unlock() {
-        const token = document.getElementById('token-input').value;
-        if (!token) return alert("Please enter your Master Key");
+    <header class="py-20 text-center">
+        <h2 class="text-5xl font-extrabold mb-4">Industrial Fasteners & Solutions</h2>
+        <p class="text-gray-400 max-w-2xl mx-auto">High-quality engineering supplies delivered across Kerala. Precision-tested bolts, nuts, and industrial hardware.</p>
+    </header>
 
-        localStorage.setItem('bolthex_key', token);
-        
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('nc-root').classList.remove('hidden');
+    <section id="gallery" class="container mx-auto">
+        <div class="flex items-center justify-between px-6 mb-8">
+            <h3 class="text-xl font-semibold border-l-4 border-sky-500 pl-4">Product Showcase</h3>
+            <span id="load-status" class="text-xs text-gray-500 uppercase tracking-widest">Syncing with GitHub...</span>
+        </div>
 
-        // 2. Start the CMS manually using the token provided
-        window.CMS.init({
-            config: {
-                backend: { 
-                    name: "github", 
-                    repo: "aarshkashy-cmd/Test", 
-                    branch: "main", 
-                    token: token 
-                },
-                // Prevents the CMS from looking for a config.yml file
-                load_config_file: false, 
-                media_folder: "photo",
-                public_folder: "photo",
-                collections: [{
-                    name: "bolthex_gallery", 
-                    label: "Bolthex Gallery",
-                    folder: "photo",
-                    create: true,
-                    fields: [
-                        {label: "Bolt Name", name: "title", widget: "string"},
-                        {label: "Bolt Photo", name: "image", widget: "image"}
-                    ]
-                }]
+        <div id="dynamic-gallery" class="gallery-grid">
+            <div class="text-gray-600 animate-pulse">Loading hardware assets...</div>
+        </div>
+    </section>
+
+    <footer class="border-t border-[#222] mt-20 py-10 text-center text-gray-500 text-sm">
+        <p>&copy; 2026 BOLTHEX Engineering. Located at Arancherry Arcade, Kakkoor, Kerala.</p>
+    </footer>
+
+    <script>
+        async function loadGallery() {
+            const container = document.getElementById('dynamic-gallery');
+            const status = document.getElementById('load-status');
+            
+            // Link to your specific GitHub repo folder
+            const repoUrl = "https://api.github.com/repos/aarshkashy-cmd/Test/contents/photo";
+
+            try {
+                const response = await fetch(repoUrl);
+                
+                if (!response.ok) throw new Error("Folder not found");
+                
+                const files = await response.json();
+                
+                // Clear the loading message
+                container.innerHTML = "";
+
+                let count = 0;
+                files.forEach(file => {
+                    // Check if file is an image
+                    if (file.name.match(/\.(jpg|jpeg|png|webp|gif)$/i)) {
+                        count++;
+                        const card = document.createElement('div');
+                        card.className = "gallery-item";
+                        card.innerHTML = `
+                            <img src="${file.download_url}" alt="Bolthex Hardware" onerror="this.src='https://via.placeholder.com/300?text=Image+Error'">
+                            <div class="p-4 text-xs text-gray-500 flex justify-between">
+                                <span>${file.name.split('.')[0].replace(/_/g, ' ')}</span>
+                                <span class="text-sky-500 font-bold">In Stock</span>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    }
+                });
+
+                status.innerText = `${count} Products Online`;
+
+                if (count === 0) {
+                    container.innerHTML = "<p class='text-center col-span-full py-10 text-gray-600'>No photos found in /photo folder.</p>";
+                }
+
+            } catch (err) {
+                console.error("Gallery Error:", err);
+                status.innerText = "Connection Error";
+                container.innerHTML = "<p class='text-center col-span-full text-red-800'>Failed to connect to GitHub Media API.</p>";
             }
-        });
-    }
+        }
 
-    const saved = localStorage.getItem('bolthex_key');
-    if (saved) document.getElementById('token-input').value = saved;
-</script>
+        // Initialize gallery on load
+        window.onload = loadGallery;
+    </script>
+
+</body>
+</html>
