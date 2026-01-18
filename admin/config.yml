@@ -1,0 +1,18 @@
+backend:
+  name: github
+  repo: aarshkashy-cmd/Test # This matches your URL
+  branch: main
+
+media_folder: "photo" # This is where your images live
+public_folder: "photo"
+
+collections:
+  - name: "gallery"
+    label: "Gallery Images"
+    folder: "photo"
+    create: true
+    slug: "{{fields.title}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Image", name: "image", widget: "image"}
+      
