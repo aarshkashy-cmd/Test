@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>BOLTHEX | Admin</title>
+    <title>BOLTHEX | Private Admin</title>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
         .login-card { background: #111; padding: 40px; border-radius: 15px; border: 1px solid #222; text-align: center; width: 320px; }
@@ -15,32 +15,15 @@
 
     <div id="login-screen" class="login-card">
         <h1 style="color:#0ea5e9; margin:0;">BOLTHEX</h1>
-        <p style="color:#555; font-size:12px;">SYSTEM UNLOCK</p>
-        <input type="password" id="token-input" placeholder="Paste GitHub Token">
-        <button onclick="unlock()">Unlock</button>
+        <p style="color:#555; font-size:12px;">DIRECT GITHUB ACCESS</p>
+        <input type="password" id="token-input" placeholder="Paste ghp_ Token Here">
+        <button onclick="unlock()">Login to Gallery</button>
     </div>
 
-    <script>
-        // 1. THE TRICK: Create a fake "empty" config file in memory
-        // This prevents the "404 Failed to load config.yml" error
-        const config = {
-            backend: { name: "github", repo: "aarshkashy-cmd/Test", branch: "main" },
-            media_folder: "photo",
-            public_folder: "photo",
-            collections: [{
-                name: "gallery",
-                label: "Gallery",
-                folder: "photo",
-                create: true,
-                fields: [
-                    {label: "Title", name: "title", widget: "string"},
-                    {label: "Image", name: "image", widget: "image"}
-                ]
-            }]
-        };
+    <div id="nc-root"></div>
 
-        const blob = new Blob([JSON.stringify(config)], { type: 'application/json' });
-        window.CMS_CONFIG = config; 
+    <script>
+        // Stop the CMS from looking for Netlify or config.yml automatically
         window.CMS_MANUAL_INIT = true;
     </script>
 
@@ -49,23 +32,45 @@
     <script>
         function unlock() {
             const token = document.getElementById('token-input').value.trim();
-            if (!token) return alert("Enter Token First");
+            if (!token) return alert("Please enter your GitHub Token");
 
+            // Save for next time
             localStorage.setItem('bolthex_token', token);
+            
+            // Hide our custom login card
             document.getElementById('login-screen').classList.add('hidden');
 
-            // 3. Re-initialize with the Token
+            // Initialize the CMS with the token HARD-CODED into the session
             window.CMS.init({
                 config: {
-                    ...config,
-                    backend: { ...config.backend, token: token }
+                    backend: {
+                        name: "github",
+                        repo: "aarshkashy-cmd/Test",
+                        branch: "main",
+                        token: token, // This skips the "Login with GitHub" button
+                        use_graphql: false 
+                    },
+                    load_config_file: false,
+                    display_url: "https://bolthex.in",
+                    media_folder: "photo",
+                    public_folder: "photo",
+                    collections: [{
+                        name: "gallery",
+                        label: "Gallery Manager",
+                        folder: "photo",
+                        create: true,
+                        fields: [
+                            {label: "Title", name: "title", widget: "string"},
+                            {label: "Image", name: "image", widget: "image"}
+                        ]
+                    }]
                 }
             });
         }
 
-        // Auto-fill
-        const savedToken = localStorage.getItem('bolthex_token');
-        if (savedToken) document.getElementById('token-input').value = savedToken;
+        // Auto-fill the box if we have the key saved
+        const saved = localStorage.getItem('bolthex_token');
+        if (saved) document.getElementById('token-input').value = saved;
     </script>
 </body>
 </html>
