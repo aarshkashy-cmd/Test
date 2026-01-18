@@ -1,230 +1,83 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <title>BOLTHEX | Precision Engineering</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Plus+Jakarta+Sans:wght@200;400;600&display=swap" rel="stylesheet">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BOLTHEX | Management Console</title>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="dns-prefetch" href="https://api.github.com">
     
     <style>
-        :root {
-            --sky-blue: #0ea5e9;
-            --bg-dark: #000000;
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--bg-dark);
-            color: #ffffff;
-            overflow-x: hidden;
-            width: 100%;
-        }
-
-        /* --- CHROMATIC INTRO --- */
-        #intro-overlay {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 1.2s ease;
-        }
-
-        .brand-text {
-            font-size: clamp(35px, 10vw, 90px);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            position: relative;
-            text-transform: uppercase;
-            animation: cinematicReveal 3.5s forwards;
-        }
-
-        .brand-text::before, .brand-text::after {
-            content: "BOLTHEX";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-        }
-        .brand-text::before { color: #ff0000; z-index: -1; animation: shiftRed 3.5s forwards; opacity: 0.5; }
-        .brand-text::after { color: #0000ff; z-index: -2; animation: shiftBlue 3.5s forwards; opacity: 0.5; }
-
-        @keyframes cinematicReveal {
-            0% { opacity: 0; filter: blur(20px); transform: scale(0.9); }
-            100% { opacity: 1; filter: blur(0px); transform: scale(1); }
-        }
-        @keyframes shiftRed { 0% { transform: translate(10px, 4px); } 100% { transform: translate(0, 0); opacity: 0; } }
-        @keyframes shiftBlue { 0% { transform: translate(-10px, -4px); } 100% { transform: translate(0, 0); opacity: 0; } }
-
-        /* --- APPLE GLASS NAV --- */
-        .glass-nav {
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: saturate(180%) blur(20px);
-            -webkit-backdrop-filter: saturate(180%) blur(20px);
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            border-radius: clamp(16px, 4vw, 24px);
-            transition: 0.4s cubic-bezier(0.15, 0, 0.15, 1);
-        }
-
-        /* --- RESPONSIVE PAGE VIEWS --- */
-        .page-view { display: none; width: 100%; min-height: 100vh; padding: 100px 6% 60px; }
-        .page-view.active { display: block; animation: appleFade 0.6s ease forwards; }
-
-        @keyframes appleFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* --- DYNAMIC GALLERY --- */
-        .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-            gap: 15px;
-        }
-
-        .gallery-item {
-            position: relative;
-            border-radius: 12px;
-            overflow: hidden;
-            aspect-ratio: 1/1;
-        }
-
-        .gallery-item img {
-            width: 100%; height: 100%; object-fit: cover;
-            transition: transform 0.6s ease;
-        }
-
-        @media (hover: hover) {
-            .gallery-item:hover img { transform: scale(1.08); }
-        }
-
-        /* --- CORRECTED WHATSAPP --- */
-        .wa-float {
-            position: fixed; bottom: 25px; right: 25px;
-            background: #25D366; width: 55px; height: 55px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            z-index: 5000; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-            transition: transform 0.3s ease;
-        }
-        .wa-float:active { transform: scale(0.9); }
-
-        /* --- MESH BG --- */
-        .mesh-bg {
-            position: fixed; inset: 0; z-index: -1;
-            background: 
-                radial-gradient(circle at 15% 15%, rgba(14, 165, 233, 0.12) 0%, transparent 45%),
-                radial-gradient(circle at 85% 85%, rgba(14, 165, 233, 0.08) 0%, transparent 45%);
-        }
+        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .admin-card { background: #111; border: 1px solid #222; padding: 40px; border-radius: 20px; width: 90%; max-width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; }
+        h1 { font-size: 1.5rem; letter-spacing: 2px; margin-bottom: 5px; color: #0ea5e9; }
+        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; background: #555; }
+        .online { background: #22c55e; box-shadow: 0 0 10px #22c55e; }
+        .status-text { font-size: 0.75rem; color: #666; text-transform: uppercase; margin-bottom: 25px; display: block; }
+        input { width: 100%; padding: 12px; background: #000; border: 1px solid #333; border-radius: 8px; color: #fff; margin-bottom: 15px; box-sizing: border-box; text-align: center; }
+        button { width: 100%; padding: 12px; background: #0ea5e9; border: none; border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #0284c7; }
+        .hidden { display: none; }
+        #debug-info { margin-top: 20px; font-size: 0.7rem; color: #444; }
     </style>
 </head>
 <body>
 
-    <div class="mesh-bg"></div>
-
-    <div id="intro-overlay">
-        <h1 class="brand-text">BOLTHEX</h1>
+    <div id="login-screen" class="admin-card">
+        <h1>BOLT<span style="font-weight:200">HEX</span></h1>
+        <span class="status-text"><span id="dot" class="status-dot"></span> System Status: <span id="stat-label">Checking...</span></span>
+        
+        <input type="password" id="token-input" placeholder="Enter GitHub Token (ghp_...)">
+        <button onclick="unlock()">Launch Dashboard</button>
+        
+        <div id="debug-info">
+            Repo: aarshkashy-cmd/Test <br>
+            Server: GitHub-API-v3
+        </div>
     </div>
 
-    <a href="https://wa.me/918281505931" target="_blank" class="wa-float" aria-label="Chat on WhatsApp">
-        <svg width="32" height="32" viewBox="0 0 448 512" fill="white">
-            <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-5.5-2.8-23.2-8.5-44.2-27.3-16.4-14.6-27.4-32.7-30.6-38.2-3.2-5.6-.3-8.6 2.4-11.3 2.5-2.5 5.5-6.5 8.3-9.8 2.8-3.2 3.7-5.5 5.5-9.3 1.9-3.7 1-6.9-.5-9.8-1.5-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 13.2 5.7 23.5 9.2 31.6 11.8 13.3 4.2 25.4 3.6 35 2.2 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
-        </svg>
-    </a>
+    <div id="nc-root" class="hidden"></div>
 
-    <nav class="fixed top-0 w-full z-[4000] py-4 px-5 md:px-12 glass-nav flex justify-between items-center">
-        <div class="text-lg md:text-xl font-bold tracking-tighter cursor-pointer" onclick="navigate('home')">BOLT<span class="text-sky-500">HEX</span></div>
-        <div class="flex space-x-5 md:space-x-10 text-[9px] md:text-[10px] font-bold uppercase tracking-widest opacity-80">
-            <span class="cursor-pointer hover:text-sky-500" onclick="navigate('gallery')">Gallery</span>
-            <span class="cursor-pointer hover:text-sky-500" onclick="navigate('about')">About</span>
-            <span class="cursor-pointer hover:text-sky-500" onclick="navigate('contact')">Contact</span>
-        </div>
-    </nav>
-
-    <main id="home-view" class="page-view active">
-        <div class="max-w-5xl mx-auto flex flex-col items-center justify-center min-h-[65vh] text-center">
-            <h2 class="text-sky-500 text-[9px] tracking-[0.8em] uppercase mb-4" data-aos="fade-up">Arancherry Kerala</h2>
-            <h1 class="text-4xl md:text-7xl font-bold mb-8 leading-[1.1]" data-aos="fade-up" data-aos-delay="150">Precision <br><span class="italic font-light text-sky-500">Fastening.</span></h1>
-            <button onclick="navigate('gallery')" class="glass-card px-8 py-3 text-[10px] uppercase tracking-widest">Explore Collection</button>
-        </div>
-    </main>
-
-    <section id="gallery-view" class="page-view">
-        <div class="max-w-7xl mx-auto">
-            <h2 class="text-3xl md:text-5xl font-bold mb-10">Portfolio</h2>
-            <div id="dynamic-gallery" class="gallery-grid">
-                </div>
-        </div>
-    </section>
-
-    <section id="about-view" class="page-view">
-        <div class="max-w-4xl mx-auto">
-            <div class="glass-card p-8 md:p-16">
-                <h2 class="text-3xl font-bold mb-6 text-sky-500">Our Story</h2>
-                <p class="text-lg md:text-xl font-light leading-relaxed opacity-80 mb-6">Based in Kakkoor, Kerala, Bolthex is a leader in premium engineering fasteners.</p>
-                <p class="text-lg md:text-xl font-light leading-relaxed opacity-80">We combine architectural beauty with structural integrity.</p>
-            </div>
-        </div>
-    </section>
-
-    <section id="contact-view" class="page-view">
-        <div class="max-w-4xl mx-auto text-center">
-            <div class="glass-card p-10 md:p-20">
-                <p class="text-sky-500 text-[10px] tracking-widest uppercase mb-6">Inquiry</p>
-                <h1 class="text-3xl md:text-5xl font-bold mb-10">+91 82815 05931</h1>
-                <p class="text-lg opacity-60 leading-relaxed">Arancherry Arcade, Kakkoor P.O, <br>Kerala 686662</p>
-            </div>
-        </div>
-    </section>
-
-    <div id="lightbox" class="fixed inset-0 z-[6000] bg-black/95 hidden items-center justify-center p-4" onclick="this.style.display='none'">
-        <img id="l-img" src="" class="max-w-full max-h-full rounded shadow-2xl border border-white/10">
-    </div>
-
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
     <script>
-        AOS.init({ duration: 800, once: true });
-
-        // --- DYNAMIC GALLERY ---
-        const totalImages = 12; // Adjust number of photos here
-        const container = document.getElementById('dynamic-gallery');
-        for (let i = 1; i <= totalImages; i++) {
-            const div = document.createElement('div');
-            div.className = 'gallery-item glass-card p-1';
-            div.onclick = function() { openLightbox(this); };
-            div.innerHTML = `<img src="photo/${i}.jpg" loading="lazy" onerror="this.parentElement.style.display='none'">`;
-            container.appendChild(div);
-        }
-
-        // --- UI LOGIC ---
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const intro = document.getElementById('intro-overlay');
-                intro.style.opacity = '0';
-                setTimeout(() => { intro.style.display = 'none'; }, 1000);
-            }, 3000);
+        // Check internet connection to GitHub
+        fetch('https://api.github.com').then(() => {
+            document.getElementById('dot').classList.add('online');
+            document.getElementById('stat-label').innerText = 'Ready';
+        }).catch(() => {
+            document.getElementById('stat-label').innerText = 'Offline';
         });
 
-        function navigate(id) {
-            document.querySelectorAll('.page-view').forEach(v => v.classList.remove('active'));
-            document.getElementById(id + '-view').classList.add('active');
-            window.scrollTo({top: 0, behavior: 'smooth'});
+        function unlock() {
+            const token = document.getElementById('token-input').value;
+            if (!token) return alert("Please enter your Master Key");
+
+            localStorage.setItem('bolthex_key', token);
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('nc-root').classList.remove('hidden');
+
+            window.CMS.init({
+                config: {
+                    backend: { name: "github", repo: "aarshkashy-cmd/Test", branch: "main", token: token },
+                    media_folder: "photo",
+                    public_folder: "photo",
+                    collections: [{
+                        name: "gallery",
+                        label: "Bolthex Gallery",
+                        folder: "photo",
+                        create: true,
+                        fields: [
+                            {label: "Bolt Name", name: "title", widget: "string"},
+                            {label: "Bolt Photo", name: "image", widget: "image"}
+                        ]
+                    }]
+                }
+            });
         }
 
-        function openLightbox(el) {
-            const img = el.querySelector('img').src;
-            document.getElementById('l-img').src = img;
-            document.getElementById('lightbox').style.display = 'flex';
-        }
+        // Auto-fill token if saved
+        const saved = localStorage.getItem('bolthex_key');
+        if (saved) document.getElementById('token-input').value = saved;
     </script>
 </body>
 </html>
