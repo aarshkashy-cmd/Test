@@ -2,48 +2,68 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BOLTHEX | Secure Admin</title>
+    <title>BOLTHEX Admin</title>
     <style>
-        body { background: #000; color: white; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        #lock-screen { text-align: center; }
-        input { padding: 10px; border-radius: 5px; border: 1px solid #333; background: #111; color: white; margin-top: 10px; }
+        body { background: #000; color: #0ea5e9; font-family: sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: #111; padding: 30px; border-radius: 15px; border: 1px solid #222; text-align: center; }
+        input { padding: 12px; width: 300px; border-radius: 5px; border: 1px solid #333; background: #000; color: white; margin: 15px 0; display: block; }
+        button { background: #0ea5e9; color: white; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="lock-screen">
-        <h1>BOLTHEX ADMIN</h1>
-        <p>Enter Master Key to Access</p>
-        <input type="password" id="pass-input" placeholder="Password...">
-        <button onclick="checkPass()" style="padding: 10px 20px; cursor: pointer;">Login</button>
-        <p id="error" style="color: red;"></p>
+    <div id="login-gate" class="box">
+        <h2>BOLTHEX CMS</h2>
+        <p style="color: #666; font-size: 0.8rem;">Enter GitHub Personal Access Token</p>
+        <input type="password" id="token-input" placeholder="ghp_xxxxxxxxxxxx">
+        <button onclick="startAdmin()">Unlock Dashboard</button>
     </div>
 
-    <div id="cms-container" class="hidden">
-        <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-    </div>
+    <div id="cms-container" class="hidden"></div>
 
+    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
     <script>
-        const MASTER_KEY = "bolthex2026"; // <--- CHANGE YOUR PASSWORD HERE
+        function startAdmin() {
+            const token = document.getElementById('token-input').value;
+            if (!token) return alert("Please enter a token");
 
-        function checkPass() {
-            const input = document.getElementById('pass-input').value;
-            if (input === MASTER_KEY) {
-                document.getElementById('lock-screen').classList.add('hidden');
-                document.getElementById('cms-container').classList.remove('hidden');
-                // Initialize Decap CMS after successful login
-                initCMS();
-            } else {
-                document.getElementById('error').innerText = "Incorrect Key";
-            }
+            // Save token to local storage so you don't have to type it every single time
+            localStorage.setItem('gh_token', token);
+            
+            document.getElementById('login-gate').style.display = 'none';
+            document.getElementById('cms-container').classList.remove('hidden');
+
+            // Initialize the CMS with the token you just typed
+            window.CMS.init({
+                config: {
+                    backend: {
+                        name: "github",
+                        repo: "aarshkashy-cmd/Test",
+                        branch: "main",
+                        token: token // Uses your input as the password
+                    },
+                    media_folder: "photo",
+                    public_folder: "photo",
+                    collections: [{
+                        name: "gallery",
+                        label: "Gallery",
+                        folder: "photo",
+                        create: true,
+                        fields: [
+                            {label: "Title", name: "title", widget: "string"},
+                            {label: "Image", name: "image", widget: "image"}
+                        ]
+                    }]
+                }
+            });
         }
 
-        // Allow "Enter" key to submit
-        document.getElementById('pass-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') checkPass();
-        });
+        // Auto-login if token is already in browser memory
+        const savedToken = localStorage.getItem('gh_token');
+        if (savedToken) {
+            document.getElementById('token-input').value = savedToken;
+        }
     </script>
 </body>
 </html>
