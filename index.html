@@ -1,19 +1,19 @@
 <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+
 <script>
+    // 1. This line is CRITICAL. It stops the "Double Loading" error.
+    window.CMS_MANUAL_INIT = true; 
+
     function unlock() {
         const token = document.getElementById('token-input').value;
         if (!token) return alert("Please enter your Master Key");
 
         localStorage.setItem('bolthex_key', token);
         
-        // Hide the login screen
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('nc-root').classList.remove('hidden');
 
-        // IMPORTANT: Tell the CMS NOT to look for a config.yml file 
-        // because we are providing the config right here in the code.
-        window.CMS_MANUAL_INIT = true; 
-
+        // 2. Start the CMS manually using the token provided
         window.CMS.init({
             config: {
                 backend: { 
@@ -22,11 +22,12 @@
                     branch: "main", 
                     token: token 
                 },
-                load_config_file: false, // Prevents reading admin/config.yml
+                // Prevents the CMS from looking for a config.yml file
+                load_config_file: false, 
                 media_folder: "photo",
                 public_folder: "photo",
                 collections: [{
-                    name: "gallery_collection", // Unique name
+                    name: "bolthex_gallery", 
                     label: "Bolthex Gallery",
                     folder: "photo",
                     create: true,
