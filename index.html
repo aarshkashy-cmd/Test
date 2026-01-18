@@ -1,30 +1,147 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Welcome</title>
-  <meta name="description" content="Basic website index">
-  <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:0;color:#111}
-    header{background:#036;color:#fff;padding:1rem}
-    main{padding:2rem}
-    footer{padding:1rem;background:#f5f5f5;color:#333;text-align:center}
-    a.button{display:inline-block;padding:.5rem 1rem;background:#0284c7;color:#fff;border-radius:6px;text-decoration:none}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOLTHEX | The Future Unfolds</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --apple-blue: #0071e3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: white;
+            overflow: hidden; /* Keep it cinematic */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* The Main Scene Container */
+        .scene {
+            position: relative;
+            text-align: center;
+        }
+
+        /* Chromatic Aberration & Slow Reveal */
+        .brand-container {
+            position: relative;
+            opacity: 0;
+            transform: scale(0.92);
+            filter: blur(20px);
+            animation: cinematicReveal 4s cubic-bezier(0.15, 0, 0.15, 1) forwards;
+        }
+
+        .brand-text {
+            font-size: clamp(60px, 18vw, 200px);
+            font-weight: 800;
+            letter-spacing: -0.06em;
+            position: relative;
+            display: inline-block;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        /* Chromatic Layers */
+        .brand-text::before,
+        .brand-text::after {
+            content: "BOLTHEX";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.7;
+        }
+
+        /* Red Shift */
+        .brand-text::before {
+            color: #ff0000;
+            z-index: -1;
+            animation: shiftRed 4s cubic-bezier(0.15, 0, 0.15, 1) forwards;
+        }
+
+        /* Blue Shift */
+        .brand-text::after {
+            color: #0000ff;
+            z-index: -2;
+            animation: shiftBlue 4s cubic-bezier(0.15, 0, 0.15, 1) forwards;
+        }
+
+        /* Subtext animations */
+        .subtitle {
+            margin-top: -10px;
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 0.2em;
+            color: #86868b;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: subtitleFade 2s ease-out 3.5s forwards;
+        }
+
+        /* Animations */
+        @keyframes cinematicReveal {
+            0% { opacity: 0; filter: blur(30px); transform: scale(0.9); }
+            40% { opacity: 0.5; filter: blur(10px); }
+            100% { opacity: 1; filter: blur(0px); transform: scale(1); }
+        }
+
+        @keyframes shiftRed {
+            0% { transform: translate(20px, 5px); opacity: 1; }
+            80% { transform: translate(2px, 1px); opacity: 0.5; }
+            100% { transform: translate(0, 0); opacity: 0; }
+        }
+
+        @keyframes shiftBlue {
+            0% { transform: translate(-20px, -5px); opacity: 1; }
+            80% { transform: translate(-2px, -1px); opacity: 0.5; }
+            100% { transform: translate(0, 0); opacity: 0; }
+        }
+
+        @keyframes subtitleFade {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Ambient Glow in Background */
+        .glow {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: var(--apple-blue);
+            filter: blur(150px);
+            border-radius: 50%;
+            opacity: 0.15;
+            z-index: -3;
+            animation: pulseGlow 8s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            from { transform: scale(1); opacity: 0.1; }
+            to { transform: scale(1.5); opacity: 0.2; }
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>Welcome to this Test repo</h1>
-  </header>
-  <main>
-    <p>This is a simple index page added to the repository.</p>
-    <p>
-      <a class="button" href="#">Learn more</a>
-    </p>
-  </main>
-  <footer>
-    <small>© 2026 Test repository</small>
-  </footer>
+
+    <div class="glow"></div>
+
+    <div class="scene">
+        <div class="brand-container">
+            <h1 class="brand-text">BOLTHEX</h1>
+        </div>
+        <p class="subtitle">THINK BEYOND LIMITS</p>
+    </div>
+
 </body>
 </html>
