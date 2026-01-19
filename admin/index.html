@@ -1,69 +1,213 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>BOLTHEX | Upload</title>
+    <title>BOLTHEX | Admin</title>
     <style>
         body { background: #000; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .card { background: #111; padding: 30px; border-radius: 12px; border: 1px solid #333; width: 320px; text-align: center; }
-        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 6px; border: 1px solid #333; box-sizing: border-box; }
+        /* Increased height to accommodate the list */
+        .card { background: #111; padding: 30px; border-radius: 12px; border: 1px solid #333; width: 350px; text-align: center; max-height: 90vh; display: flex; flex-direction: column; }
+        
+        h2 { margin-top: 0; font-size: 20px; }
+        h3 { font-size: 16px; margin: 20px 0 10px 0; color: #888; border-top: 1px solid #333; padding-top: 15px; }
+
+        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #333; box-sizing: border-box; }
         input { background: #000; color: #fff; }
-        button { background: #0ea5e9; color: white; border: none; cursor: pointer; font-weight: bold; }
-        #status { font-size: 12px; margin-top: 10px; color: #888; }
+        
+        /* Button Styles */
+        .btn-upload { background: #0ea5e9; color: white; border: none; cursor: pointer; font-weight: bold; }
+        .btn-upload:hover { background: #0284c7; }
+        
+        .btn-load { background: #333; color: #fff; border: none; cursor: pointer; }
+        .btn-load:hover { background: #444; }
+
+        .btn-delete { background: #ef4444; color: white; width: auto; padding: 5px 10px; margin: 0; font-size: 12px; border: none; cursor: pointer; }
+        .btn-delete:hover { background: #dc2626; }
+
+        #status { font-size: 12px; margin-top: 10px; color: #888; min-height: 15px; }
+
+        /* Gallery List Styles */
+        #gallery-list { 
+            text-align: left; 
+            overflow-y: auto; 
+            flex-grow: 1; 
+            margin-top: 10px;
+            border-top: 1px solid #333;
+        }
+        .file-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 10px 5px; 
+            border-bottom: 1px solid #222; 
+            font-size: 13px;
+        }
+        .file-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 200px;
+        }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>BOLTHEX UPLOAD</h2>
+    <h2>BOLTHEX ADMIN</h2>
+    
     <input type="password" id="token" placeholder="GitHub Token">
     <input type="file" id="fileInput" accept="image/*">
-    <button onclick="uploadFile()">Upload to Gallery</button>
+    <button class="btn-upload" onclick="uploadFile()">Upload to Gallery</button>
     <div id="status"></div>
+
+    <h3>Manage Gallery</h3>
+    <button class="btn-load" onclick="loadGallery()">Load / Refresh Images</button>
+    <div id="gallery-list"></div>
 </div>
 
 <script>
+    // Configuration
+    const REPO_OWNER = 'aarshkashy-cmd';
+    const REPO_NAME = 'Test';
+    const FOLDER_PATH = 'photo'; // The folder inside the repo
+
     // Remember token
     const savedToken = localStorage.getItem('bt_token');
     if (savedToken) document.getElementById('token').value = savedToken;
 
+    // Helper: Update Status Text
+    function setStatus(msg, isError = false) {
+        const el = document.getElementById('status');
+        el.innerText = msg;
+        el.style.color = isError ? '#ef4444' : '#888';
+    }
+
+    // 1. Upload Function
     async function uploadFile() {
         const token = document.getElementById('token').value;
         const fileInput = document.getElementById('fileInput');
-        const status = document.getElementById('status');
         
         if (!fileInput.files[0] || !token) return alert("Select file and enter token");
         
         localStorage.setItem('bt_token', token);
-        status.innerText = "Uploading...";
+        setStatus("Uploading...");
 
         const file = fileInput.files[0];
         const reader = new FileReader();
         
         reader.onload = async () => {
             const content = reader.result.split(',')[1];
-            const fileName = `bolt_${Date.now()}.jpg`; // Unique name
-            const url = `https://api.github.com/repos/aarshkashy-cmd/Test/contents/photo/${fileName}`;
+            // Clean filename to avoid issues, or use timestamp
+            const fileName = `bolt_${Date.now()}.jpg`; 
+            const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FOLDER_PATH}/${fileName}`;
 
+            try {
+                const response = await fetch(url, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: `Upload ${fileName}`,
+                        content: content
+                    })
+                });
+
+                if (response.ok) {
+                    setStatus("Success! Photo added.");
+                    fileInput.value = "";
+                    loadGallery(); // Auto-refresh list after upload
+                } else {
+                    const err = await response.json();
+                    setStatus(`Error: ${err.message}`, true);
+                }
+            } catch (error) {
+                setStatus("Network Error", true);
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // 2. Load Gallery (List Files)
+    async function loadGallery() {
+        const token = document.getElementById('token').value;
+        const galleryDiv = document.getElementById('gallery-list');
+        
+        if (!token) return alert("Enter GitHub Token first");
+        localStorage.setItem('bt_token', token);
+
+        setStatus("Loading gallery...");
+        galleryDiv.innerHTML = ""; // Clear list
+
+        const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FOLDER_PATH}`;
+
+        try {
             const response = await fetch(url, {
-                method: 'PUT',
+                headers: { 'Authorization': `token ${token}` }
+            });
+
+            if (!response.ok) throw new Error("Failed to fetch");
+
+            const files = await response.json();
+            
+            // Filter only files (ignore subfolders if any)
+            const images = files.filter(f => f.type === 'file');
+
+            if (images.length === 0) {
+                galleryDiv.innerHTML = "<div style='padding:10px; color:#666;'>No images found.</div>";
+                setStatus("Gallery loaded (Empty).");
+                return;
+            }
+
+            // Render list
+            images.forEach(file => {
+                const div = document.createElement('div');
+                div.className = 'file-item';
+                div.innerHTML = `
+                    <span class="file-name" title="${file.name}">${file.name}</span>
+                    <button class="btn-delete" onclick="deleteFile('${file.name}', '${file.sha}')">Delete</button>
+                `;
+                galleryDiv.appendChild(div);
+            });
+            setStatus(`Loaded ${images.length} images.`);
+
+        } catch (error) {
+            setStatus("Error loading gallery. Check token/path.", true);
+        }
+    }
+
+    // 3. Delete Function
+    async function deleteFile(fileName, sha) {
+        if (!confirm(`Are you sure you want to delete ${fileName}?`)) return;
+
+        const token = document.getElementById('token').value;
+        setStatus(`Deleting ${fileName}...`);
+
+        const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FOLDER_PATH}/${fileName}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'DELETE',
                 headers: {
                     'Authorization': `token ${token}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    message: `Upload ${fileName}`,
-                    content: content
+                    message: `Delete ${fileName}`,
+                    sha: sha // GitHub requires the SHA to delete
                 })
             });
 
             if (response.ok) {
-                status.innerText = "Success! Photo added.";
-                fileInput.value = "";
+                setStatus("File deleted.");
+                loadGallery(); // Refresh list
             } else {
-                status.innerText = "Error. Check token permissions.";
+                const err = await response.json();
+                setStatus(`Delete failed: ${err.message}`, true);
             }
-        };
-        reader.readAsDataURL(file);
+        } catch (error) {
+            setStatus("Network error during delete", true);
+        }
     }
 </script>
 </body>
