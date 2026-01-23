@@ -1,213 +1,773 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>BOLTHEX | Admin</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>BOLTHEX | Universal Command v5</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        /* Increased height to accommodate the list */
-        .card { background: #111; padding: 30px; border-radius: 12px; border: 1px solid #333; width: 350px; text-align: center; max-height: 90vh; display: flex; flex-direction: column; }
-        
-        h2 { margin-top: 0; font-size: 20px; }
-        h3 { font-size: 16px; margin: 20px 0 10px 0; color: #888; border-top: 1px solid #333; padding-top: 15px; }
-
-        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #333; box-sizing: border-box; }
-        input { background: #000; color: #fff; }
-        
-        /* Button Styles */
-        .btn-upload { background: #0ea5e9; color: white; border: none; cursor: pointer; font-weight: bold; }
-        .btn-upload:hover { background: #0284c7; }
-        
-        .btn-load { background: #333; color: #fff; border: none; cursor: pointer; }
-        .btn-load:hover { background: #444; }
-
-        .btn-delete { background: #ef4444; color: white; width: auto; padding: 5px 10px; margin: 0; font-size: 12px; border: none; cursor: pointer; }
-        .btn-delete:hover { background: #dc2626; }
-
-        #status { font-size: 12px; margin-top: 10px; color: #888; min-height: 15px; }
-
-        /* Gallery List Styles */
-        #gallery-list { 
-            text-align: left; 
-            overflow-y: auto; 
-            flex-grow: 1; 
-            margin-top: 10px;
-            border-top: 1px solid #333;
+        /* --- CORE THEME (Cyberpunk/Clean) --- */
+        :root {
+            --bg-body: #09090b;
+            --bg-panel: #18181b;
+            --bg-card: #27272a;
+            --bg-input: #121215;
+            
+            --accent: #6366f1; /* Indigo */
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+            
+            --border: #3f3f46;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            
+            --sidebar-width: 260px;
+            --radius: 8px;
         }
-        .file-item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 10px 5px; 
-            border-bottom: 1px solid #222; 
-            font-size: 13px;
-        }
-        .file-name {
+
+        * { box-sizing: border-box; outline: none; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        body {
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            height: 100vh;
+            display: flex;
             overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 200px;
         }
+
+        /* --- SIDEBAR --- */
+        aside {
+            width: var(--sidebar-width);
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .brand {
+            font-size: 18px; font-weight: 800; color: var(--accent); letter-spacing: 1px;
+            display: flex; align-items: center; gap: 10px; margin-bottom: 25px;
+            text-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        nav { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; overflow-y: auto; }
+        
+        .nav-header {
+            font-size: 10px; text-transform: uppercase; color: var(--text-muted); 
+            margin-top: 15px; margin-bottom: 5px; font-weight: 700; letter-spacing: 0.5px;
+        }
+
+        .nav-btn {
+            background: transparent; border: none; color: var(--text-muted);
+            padding: 10px 12px; text-align: left; border-radius: var(--radius);
+            cursor: pointer; font-weight: 500; font-size: 13px;
+            display: flex; align-items: center; gap: 12px; transition: 0.2s;
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.03); color: white; }
+        .nav-btn.active { background: rgba(99, 102, 241, 0.15); color: var(--accent); border-left: 3px solid var(--accent); }
+        .nav-btn i { font-size: 18px; }
+
+        /* --- MAIN AREA --- */
+        main {
+            flex-grow: 1; position: relative; overflow-y: auto; display: flex; flex-direction: column;
+        }
+
+        header {
+            position: sticky; top: 0; background: rgba(9, 9, 11, 0.8);
+            backdrop-filter: blur(12px); padding: 15px 30px; border-bottom: 1px solid var(--border);
+            z-index: 50; display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .view-panel { display: none; padding: 30px; max-width: 1000px; margin: 0 auto; width: 100%; padding-bottom: 100px; }
+        .view-panel.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- UI ELEMENTS --- */
+        .card {
+            background: var(--bg-panel); border: 1px solid var(--border); border-radius: 12px;
+            padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .input-group { margin-bottom: 15px; }
+        label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; font-weight: 600; }
+        
+        input, textarea, select {
+            width: 100%; background: var(--bg-input); border: 1px solid var(--border); color: white;
+            padding: 12px; border-radius: var(--radius); font-family: inherit; font-size: 14px; transition: 0.2s;
+        }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+        
+        .btn {
+            padding: 10px 20px; border-radius: var(--radius); border: none; cursor: pointer; font-weight: 600; font-size: 13px;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;
+        }
+        .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 15px var(--accent-glow); }
+        .btn-primary:hover { filter: brightness(1.1); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+        .btn-secondary { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); }
+        
+        /* Floating Action Button */
+        .fab-bar {
+            position: fixed; bottom: 30px; right: 30px; display: flex; gap: 10px; z-index: 90;
+        }
+
+        /* --- SPECIFIC VIEWS --- */
+        .node-badge {
+            font-family: 'JetBrains Mono', monospace; font-size: 10px; 
+            background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 4px; color: var(--accent);
+        }
+
+        /* History Timeline */
+        .history-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px; border-bottom: 1px solid var(--border);
+        }
+        .history-item:last-child { border-bottom: none; }
+        .commit-meta { display: flex; flex-direction: column; gap: 4px; }
+        .commit-msg { font-weight: 500; font-size: 14px; }
+        .commit-date { font-size: 11px; color: var(--text-muted); display: flex; gap: 10px; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            aside { position: fixed; left: -100%; height: 100%; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
+            aside.open { left: 0; }
+            .fab-bar { width: calc(100% - 40px); bottom: 20px; right: 20px; flex-direction: column; }
+            .fab-bar .btn { width: 100%; }
+            header { padding: 15px; }
+            .view-panel { padding: 15px; padding-bottom: 150px; }
+        }
+
+        /* Toast & Loader */
+        .toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            background: var(--bg-card); border: 1px solid var(--border); padding: 12px 25px;
+            border-radius: 50px; display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6); z-index: 200; 
+            opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .spinner { width: 16px; height: 16px; border: 2px solid var(--accent); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>BOLTHEX ADMIN</h2>
-    
-    <input type="password" id="token" placeholder="GitHub Token">
-    <input type="file" id="fileInput" accept="image/*">
-    <button class="btn-upload" onclick="uploadFile()">Upload to Gallery</button>
-    <div id="status"></div>
+<div class="app-container" style="display:flex; width:100%;">
+    <aside id="sidebar">
+        <div class="brand">
+            <span class="material-icons-round">bolt</span> BOLT<span style="color:white">HEX</span>
+        </div>
 
-    <h3>Manage Gallery</h3>
-    <button class="btn-load" onclick="loadGallery()">Load / Refresh Images</button>
-    <div id="gallery-list"></div>
+        <div class="input-group">
+            <label>GitHub Token (PAT)</label>
+            <input type="password" id="gh-token" placeholder="ghp_..." onchange="saveToken()" style="font-family:'JetBrains Mono'">
+        </div>
+
+        <nav>
+            <div class="nav-header">Content</div>
+            <button class="nav-btn active" onclick="switchTab('tab-content')">
+                <i class="material-icons-round">edit_note</i> Text Editor
+            </button>
+            <button class="nav-btn" onclick="switchTab('tab-anim')">
+                <i class="material-icons-round">motion_photos_on</i> Animations
+            </button>
+            <button class="nav-btn" onclick="switchTab('tab-theme')">
+                <i class="material-icons-round">palette</i> Theme
+            </button>
+            <button class="nav-btn" onclick="switchTab('tab-gallery')">
+                <i class="material-icons-round">collections</i> Gallery
+            </button>
+
+            <div class="nav-header">System</div>
+            <button class="nav-btn" onclick="switchTab('tab-backups')">
+                <i class="material-icons-round">history</i> Time Machine
+            </button>
+            <button class="nav-btn" onclick="switchTab('tab-upload')">
+                <i class="material-icons-round">upload_file</i> Replace Index
+            </button>
+            <button class="nav-btn" onclick="switchTab('tab-settings')">
+                <i class="material-icons-round">settings</i> Settings
+            </button>
+        </nav>
+        
+        <div style="font-size:10px; color:var(--text-muted); text-align:center; margin-top:20px;">
+            Universal Admin v5.0
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <button class="btn btn-secondary" style="padding:8px;" onclick="toggleSidebar()">
+                <i class="material-icons-round">menu</i>
+            </button>
+            <div id="page-title" style="font-weight:700;">Content Editor</div>
+            <button class="btn btn-primary" onclick="loadSiteData()">
+                <i class="material-icons-round">sync</i> <span style="display:none; @media(min-width:600px){display:inline}">Load Repo</span>
+            </button>
+        </header>
+
+        <div id="tab-content" class="view-panel active">
+            <div id="text-container" style="display:grid; gap:15px;">
+                <div style="text-align:center; padding:60px; color:var(--text-muted);">
+                    <i class="material-icons-round" style="font-size:40px; opacity:0.5; margin-bottom:10px;">cloud_off</i><br>
+                    Please enter your Token and click "Load Repo"
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-anim" class="view-panel">
+            <div class="card" style="border-left: 4px solid var(--accent);">
+                <h3>Universal Animation Controller</h3>
+                <p style="font-size:13px; color:var(--text-muted);">
+                    This tool scans your HTML for <code>data-aos</code> attributes. You can change animation styles even if you change the website layout completely.
+                </p>
+            </div>
+            <div id="anim-container" style="display:grid; gap:15px;"></div>
+        </div>
+
+        <div id="tab-theme" class="view-panel">
+            <div class="card">
+                <h3>Global CSS Variables</h3>
+                <div id="theme-container" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:15px; margin-top:15px;"></div>
+            </div>
+        </div>
+
+        <div id="tab-gallery" class="view-panel">
+            <div class="card" style="display:flex; gap:10px; align-items:center; justify-content:space-between;">
+                <h3>Media Assets</h3>
+                <div style="display:flex; gap:5px;">
+                    <input type="file" id="imgInput" hidden accept="image/*" onchange="uploadImage()">
+                    <button class="btn btn-primary" onclick="document.getElementById('imgInput').click()">
+                        <i class="material-icons-round">add_photo_alternate</i> Upload New
+                    </button>
+                </div>
+            </div>
+            <div id="gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap:15px;"></div>
+        </div>
+
+        <div id="tab-backups" class="view-panel">
+            <div class="card" style="border-left: 4px solid var(--warning);">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3>Version History</h3>
+                    <button class="btn btn-secondary" onclick="loadCommits()">
+                        <i class="material-icons-round">refresh</i> Refresh
+                    </button>
+                </div>
+                <p style="font-size:13px; color:var(--text-muted);">
+                    View past versions of <code>index.html</code>. Clicking "Restore" will revert the live site to that exact moment.
+                </p>
+            </div>
+            <div id="commits-list" class="card" style="padding:0; overflow:hidden;">
+                </div>
+        </div>
+
+        <div id="tab-upload" class="view-panel">
+            <div class="card" style="text-align:center; padding:50px;">
+                <i class="material-icons-round" style="font-size:48px; color:var(--accent);">upload_file</i>
+                <h2>Replace Entire Website</h2>
+                <p style="color:var(--text-muted); max-width:400px; margin: 10px auto 30px;">
+                    Upload a new <code>index.html</code> file from your computer. This will overwrite the current live file on GitHub.
+                </p>
+                <input type="file" id="htmlUploadInput" accept=".html" style="display:none" onchange="handleHtmlUpload(this)">
+                <button class="btn btn-primary" style="padding:15px 30px; font-size:16px;" onclick="document.getElementById('htmlUploadInput').click()">
+                    Select HTML File
+                </button>
+            </div>
+        </div>
+
+        <div id="tab-settings" class="view-panel">
+            <div class="card">
+                <h3>Repository Configuration</h3>
+                <div class="input-group">
+                    <label>GitHub Username / Org</label>
+                    <input type="text" id="cfg-owner" value="aarshkashy-cmd">
+                </div>
+                <div class="input-group">
+                    <label>Repository Name</label>
+                    <input type="text" id="cfg-repo" value="Test">
+                </div>
+                <div class="input-group">
+                    <label>Main File Path</label>
+                    <input type="text" id="cfg-path" value="index.html">
+                </div>
+                <div class="input-group">
+                    <label>Image Folder</label>
+                    <input type="text" id="cfg-gal" value="photo">
+                </div>
+                <button class="btn btn-primary" onclick="saveConfig()">Save Configuration</button>
+            </div>
+        </div>
+
+        <div class="fab-bar">
+            <a id="live-link" href="#" target="_blank" class="btn btn-secondary">
+                <i class="material-icons-round">open_in_new</i> View Site
+            </a>
+            <button id="publish-btn" class="btn btn-primary" onclick="publishChanges()" style="display:none;">
+                <i class="material-icons-round">save</i> PUBLISH CHANGES
+            </button>
+        </div>
+
+    </main>
+</div>
+
+<div id="toast" class="toast">
+    <div class="spinner" id="t-spin"></div>
+    <span id="t-msg">Processing...</span>
 </div>
 
 <script>
-    // Configuration
-    const REPO_OWNER = 'aarshkashy-cmd';
-    const REPO_NAME = 'Test';
-    const FOLDER_PATH = 'photo'; // The folder inside the repo
+    // --- GLOBAL CONFIG & STATE ---
+    let CONFIG = { owner: 'aarshkashy-cmd', repo: 'Test', path: 'index.html', gallery: 'photo' };
+    let STATE = {
+        sha: null,      // SHA of current index.html
+        dom: null,      // Parsed DOM object
+        rawCss: "",     // Content of <style>
+        textNodes: [],  // Editable text references
+        animNodes: [],  // Editable animation references
+        cssVars: []     // Editable CSS variables
+    };
 
-    // Remember token
-    const savedToken = localStorage.getItem('bt_token');
-    if (savedToken) document.getElementById('token').value = savedToken;
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Load stored data
+        const t = localStorage.getItem('bt_token');
+        if(t) document.getElementById('gh-token').value = t;
 
-    // Helper: Update Status Text
-    function setStatus(msg, isError = false) {
-        const el = document.getElementById('status');
-        el.innerText = msg;
-        el.style.color = isError ? '#ef4444' : '#888';
+        const c = localStorage.getItem('bt_config');
+        if(c) {
+            CONFIG = JSON.parse(c);
+            ['owner','repo','path','gal'].forEach(k => {
+                if(CONFIG[k]) document.getElementById(`cfg-${k}`).value = CONFIG[k];
+            });
+            // Map legacy key 'galleryPath' if needed or fix key mismatch
+            document.getElementById('cfg-gal').value = CONFIG.gallery || 'photo'; 
+        }
+
+        updateLiveLink();
+    });
+
+    // --- CORE API FUNCTIONS ---
+    const API_BASE = "https://api.github.com/repos";
+    const getHeaders = () => ({ 
+        "Authorization": `token ${document.getElementById('gh-token').value}`,
+        "Accept": "application/vnd.github.v3+json"
+    });
+
+    function showToast(msg, spin=false) {
+        const t = document.getElementById('toast');
+        document.getElementById('t-msg').innerText = msg;
+        document.getElementById('t-spin').style.display = spin ? 'block' : 'none';
+        t.classList.add('show');
+        if(!spin) setTimeout(()=>t.classList.remove('show'), 3000);
     }
 
-    // 1. Upload Function
-    async function uploadFile() {
-        const token = document.getElementById('token').value;
-        const fileInput = document.getElementById('fileInput');
-        
-        if (!fileInput.files[0] || !token) return alert("Select file and enter token");
-        
-        localStorage.setItem('bt_token', token);
-        setStatus("Uploading...");
+    // --- 1. LOAD SITE (Universal Parsing) ---
+    async function loadSiteData() {
+        if(!document.getElementById('gh-token').value) return showToast("Token Missing!");
+        showToast("Fetching Repository...", true);
 
-        const file = fileInput.files[0];
+        try {
+            // Fetch Index.html
+            const url = `${API_BASE}/${CONFIG.owner}/${CONFIG.repo}/contents/${CONFIG.path}`;
+            const res = await fetch(url, { headers: getHeaders() });
+            if(!res.ok) throw new Error("File not found or Access Denied");
+            
+            const data = await res.json();
+            STATE.sha = data.sha;
+            
+            // Decode Base64 Content
+            const content = decodeURIComponent(escape(window.atob(data.content)));
+            
+            // Parse DOM
+            const parser = new DOMParser();
+            STATE.dom = parser.parseFromString(content, 'text/html');
+
+            // Run Parsers
+            parseTextContent();
+            parseAnimations();
+            parseTheme(content); // Use raw string for CSS regex
+            
+            // Enable Save
+            document.getElementById('publish-btn').style.display = 'flex';
+            showToast("Site Loaded Successfully");
+            switchTab('tab-content');
+
+        } catch(e) { showToast("Error: " + e.message); }
+    }
+
+    // --- PARSER 1: Universal Text Walker ---
+    function parseTextContent() {
+        STATE.textNodes = [];
+        const container = document.getElementById('text-container');
+        container.innerHTML = '';
+        let counter = 0;
+
+        function walk(node) {
+            if(node.nodeType === 3) { // Text Node
+                const txt = node.nodeValue.trim();
+                const parent = node.parentNode;
+                const tag = parent.tagName;
+                
+                // Filter meaningful text
+                if(txt.length > 1 && !['SCRIPT','STYLE','NOSCRIPT','IFRAME'].includes(tag)) {
+                    // Create context label (e.g., "H1 > SPAN")
+                    let ctx = tag;
+                    if(parent.id) ctx += `#${parent.id}`;
+                    else if(parent.className) ctx += `.${parent.className.split(' ')[0]}`;
+
+                    STATE.textNodes.push({ id: counter, node: node, original: txt });
+
+                    const div = document.createElement('div');
+                    div.className = 'card';
+                    div.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <span class="node-badge">${ctx}</span>
+                        </div>
+                        <textarea id="txt-${counter}" rows="2" style="width:100%">${txt}</textarea>
+                    `;
+                    container.appendChild(div);
+                    counter++;
+                }
+            } else {
+                node.childNodes.forEach(walk);
+            }
+        }
+        walk(STATE.dom.body);
+    }
+
+    // --- PARSER 2: AOS Animation Finder ---
+    function parseAnimations() {
+        STATE.animNodes = [];
+        const container = document.getElementById('anim-container');
+        container.innerHTML = '';
+
+        const els = STATE.dom.querySelectorAll('[data-aos]');
+        if(els.length === 0) container.innerHTML = '<div style="padding:20px; text-align:center; color:gray">No AOS animations found.</div>';
+
+        els.forEach((el, idx) => {
+            STATE.animNodes.push({ el, idx });
+            const currentAnim = el.getAttribute('data-aos');
+            const duration = el.getAttribute('data-aos-duration') || '400';
+            const delay = el.getAttribute('data-aos-delay') || '0';
+            const snippet = (el.innerText || el.tagName).substring(0, 30);
+
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.innerHTML = `
+                <div style="margin-bottom:10px; font-weight:600; font-size:12px; color:var(--text-muted)">${snippet}...</div>
+                <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px;">
+                    <div>
+                        <label>Animation</label>
+                        <select id="anim-type-${idx}">
+                            <option value="${currentAnim}">${currentAnim}</option>
+                            <option value="fade-up">fade-up</option>
+                            <option value="fade-down">fade-down</option>
+                            <option value="fade-left">fade-left</option>
+                            <option value="fade-right">fade-right</option>
+                            <option value="zoom-in">zoom-in</option>
+                            <option value="zoom-out">zoom-out</option>
+                            <option value="flip-up">flip-up</option>
+                        </select>
+                    </div>
+                    <div><label>Dur (ms)</label><input type="number" id="anim-dur-${idx}" value="${duration}"></div>
+                    <div><label>Delay</label><input type="number" id="anim-delay-${idx}" value="${delay}"></div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // --- PARSER 3: CSS Variables ---
+    function parseTheme(htmlContent) {
+        STATE.cssVars = [];
+        const container = document.getElementById('theme-container');
+        container.innerHTML = '';
+
+        // Extract style block
+        const styleMatch = htmlContent.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+        if(!styleMatch) { container.innerHTML = 'No <style> block found.'; return; }
+        
+        STATE.rawCss = styleMatch[1];
+        
+        // Find :root
+        const rootBlock = STATE.rawCss.match(/:root\s*{([^}]+)}/);
+        if(!rootBlock) return;
+
+        const vars = rootBlock[1].split(';');
+        vars.forEach((v, i) => {
+            const parts = v.split(':');
+            if(parts.length === 2) {
+                const name = parts[0].trim();
+                const val = parts[1].trim();
+                if(name.startsWith('--')) {
+                    STATE.cssVars.push({ name, val });
+                    const isColor = val.startsWith('#') || val.startsWith('rgb');
+                    
+                    const div = document.createElement('div');
+                    div.innerHTML = `
+                        <label>${name}</label>
+                        <div style="display:flex; gap:5px;">
+                            ${isColor ? `<input type="color" id="theme-col-${i}" value="${val.substr(0,7)}" style="width:40px; padding:0; height:40px;" onchange="document.getElementById('theme-val-${i}').value = this.value">` : ''}
+                            <input type="text" id="theme-val-${i}" value="${val}">
+                        </div>
+                    `;
+                    container.appendChild(div);
+                }
+            }
+        });
+    }
+
+    // --- ACTION: PUBLISH ALL CHANGES ---
+    async function publishChanges() {
+        showToast("Compiling & Uploading...", true);
+
+        // 1. Apply Text Changes
+        STATE.textNodes.forEach(item => {
+            const input = document.getElementById(`txt-${item.id}`);
+            if(input) item.node.nodeValue = input.value; // Keeps spacing check loose
+        });
+
+        // 2. Apply Animation Changes
+        STATE.animNodes.forEach(item => {
+            const type = document.getElementById(`anim-type-${item.idx}`).value;
+            const dur = document.getElementById(`anim-dur-${item.idx}`).value;
+            const del = document.getElementById(`anim-delay-${item.idx}`).value;
+            
+            item.el.setAttribute('data-aos', type);
+            item.el.setAttribute('data-aos-duration', dur);
+            item.el.setAttribute('data-aos-delay', del);
+        });
+
+        // 3. Apply CSS Changes
+        if(STATE.cssVars.length > 0) {
+            let newRoot = "";
+            STATE.cssVars.forEach((v, i) => {
+                const val = document.getElementById(`theme-val-${i}`).value;
+                newRoot += `${v.name}: ${val};\n`;
+            });
+            // Regex replace the root block
+            const regex = /:root\s*{([^}]+)}/;
+            let newCss = STATE.rawCss.replace(regex, `:root {\n${newRoot}}`);
+            
+            // Inject back into DOM
+            const styleTag = STATE.dom.querySelector('style');
+            if(styleTag) styleTag.textContent = newCss;
+        }
+
+        // 4. Serialize & Upload
+        const serializer = new XMLSerializer();
+        let finalHtml = "<!DOCTYPE html>\n" + serializer.serializeToString(STATE.dom);
+        
+        await uploadFileToGitHub(CONFIG.path, finalHtml, "Admin Panel Update", STATE.sha);
+    }
+
+    // --- FEATURE: TIME MACHINE (ROLLBACK) ---
+    async function loadCommits() {
+        showToast("Loading History...", true);
+        const list = document.getElementById('commits-list');
+        list.innerHTML = '';
+
+        try {
+            const url = `${API_BASE}/${CONFIG.owner}/${CONFIG.repo}/commits?path=${CONFIG.path}&per_page=10`;
+            const res = await fetch(url, { headers: getHeaders() });
+            const commits = await res.json();
+
+            commits.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.innerHTML = `
+                    <div class="commit-meta">
+                        <span class="commit-msg">${c.commit.message}</span>
+                        <span class="commit-date">
+                            <span>${new Date(c.commit.author.date).toLocaleString()}</span>
+                            <span>• ${c.commit.author.name}</span>
+                        </span>
+                    </div>
+                    <button class="btn btn-secondary" style="font-size:10px;" onclick="revertToCommit('${c.sha}')">
+                        RESTORE
+                    </button>
+                `;
+                list.appendChild(div);
+            });
+            showToast("History Loaded");
+        } catch(e) { showToast("Error loading history"); }
+    }
+
+    async function revertToCommit(commitSha) {
+        if(!confirm("Are you sure? This will overwrite the live site with this version.")) return;
+        showToast("Restoring Version...", true);
+        
+        try {
+            // Get file content at specific commit
+            const url = `${API_BASE}/${CONFIG.owner}/${CONFIG.repo}/contents/${CONFIG.path}?ref=${commitSha}`;
+            const res = await fetch(url, { headers: getHeaders() });
+            const data = await res.json();
+            
+            // We need the CURRENT sha to overwrite it, not the old sha
+            const currentRes = await fetch(`${API_BASE}/${CONFIG.owner}/${CONFIG.repo}/contents/${CONFIG.path}`, { headers: getHeaders() });
+            const currentData = await currentRes.json();
+
+            const content = decodeURIComponent(escape(window.atob(data.content)));
+            
+            await uploadFileToGitHub(CONFIG.path, content, `Rollback to ${commitSha.substring(0,7)}`, currentData.sha);
+            
+        } catch(e) { showToast("Rollback Failed: " + e.message); }
+    }
+
+    // --- FEATURE: REPLACE INDEX FILE ---
+    function handleHtmlUpload(input) {
+        const file = input.files[0];
+        if(!file) return;
+        
         const reader = new FileReader();
-        
-        reader.onload = async () => {
-            const content = reader.result.split(',')[1];
-            // Clean filename to avoid issues, or use timestamp
-            const fileName = `bolt_${Date.now()}.jpg`; 
-            const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FOLDER_PATH}/${fileName}`;
-
+        reader.onload = async (e) => {
+            if(!confirm("WARNING: This will completely replace your website's index.html. Continue?")) return;
+            
+            showToast("Replacing Website...", true);
             try {
-                const response = await fetch(url, {
+                // Need current SHA to overwrite
+                const checkUrl = `${API_BASE}/${CONFIG.owner}/${CONFIG.repo}/contents/${CONFIG.path}`;
+                const checkRes = await fetch(checkUrl, { headers: getHeaders() });
+                const checkData = await checkRes.json();
+                
+                await uploadFileToGitHub(CONFIG.path, e.target.result, "Admin: Full Site Upload", checkData.sha);
+            } catch(err) { showToast("Error: " + err.message); }
+        };
+        reader.readAsText(file);
+    }
+
+    // --- FEATURE: GALLERY UPLOAD ---
+    async function uploadImage() {
+        const file = document.getElementById('imgInput').files[0];
+        if(!file) return;
+        
+        showToast("Uploading Image...", true);
+        const reader = new FileReader();
+        reader.onload = async () => {
+            const content = reader.result.split(',')[1]; // Base64
+            const path = `${CONFIG.gallery}/${Date.now()}_${file.name}`;
+            
+            try {
+                await fetch(`${API_BASE}/${CONFIG.owner}/${CONFIG.repo}/contents/${path}`, {
                     method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${token}`,
-                        'Content-Type': 'application/json'
-                    },
+                    headers: getHeaders(),
                     body: JSON.stringify({
-                        message: `Upload ${fileName}`,
+                        message: "Gallery Upload",
                         content: content
                     })
                 });
-
-                if (response.ok) {
-                    setStatus("Success! Photo added.");
-                    fileInput.value = "";
-                    loadGallery(); // Auto-refresh list after upload
-                } else {
-                    const err = await response.json();
-                    setStatus(`Error: ${err.message}`, true);
-                }
-            } catch (error) {
-                setStatus("Network Error", true);
-            }
+                showToast("Image Uploaded");
+                // Refresh gallery if active
+                if(document.getElementById('tab-gallery').classList.contains('active')) loadGallery();
+            } catch(e) { showToast("Upload Failed"); }
         };
         reader.readAsDataURL(file);
     }
-
-    // 2. Load Gallery (List Files)
+    
     async function loadGallery() {
-        const token = document.getElementById('token').value;
-        const galleryDiv = document.getElementById('gallery-list');
-        
-        if (!token) return alert("Enter GitHub Token first");
-        localStorage.setItem('bt_token', token);
-
-        setStatus("Loading gallery...");
-        galleryDiv.innerHTML = ""; // Clear list
-
-        const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FOLDER_PATH}`;
-
+        const grid = document.getElementById('gallery-grid');
+        grid.innerHTML = '<span class="spinner"></span>';
         try {
-            const response = await fetch(url, {
-                headers: { 'Authorization': `token ${token}` }
-            });
-
-            if (!response.ok) throw new Error("Failed to fetch");
-
-            const files = await response.json();
+            const url = `${API_BASE}/${CONFIG.owner}/${CONFIG.repo}/contents/${CONFIG.gallery}`;
+            const res = await fetch(url, { headers: getHeaders() });
+            const data = await res.json();
             
-            // Filter only files (ignore subfolders if any)
-            const images = files.filter(f => f.type === 'file');
-
-            if (images.length === 0) {
-                galleryDiv.innerHTML = "<div style='padding:10px; color:#666;'>No images found.</div>";
-                setStatus("Gallery loaded (Empty).");
-                return;
-            }
-
-            // Render list
-            images.forEach(file => {
-                const div = document.createElement('div');
-                div.className = 'file-item';
-                div.innerHTML = `
-                    <span class="file-name" title="${file.name}">${file.name}</span>
-                    <button class="btn-delete" onclick="deleteFile('${file.name}', '${file.sha}')">Delete</button>
-                `;
-                galleryDiv.appendChild(div);
+            grid.innerHTML = '';
+            data.forEach(f => {
+                if(f.name.match(/\.(jpg|png|webp|gif)$/i)) {
+                    const div = document.createElement('div');
+                    div.innerHTML = `
+                        <div class="card" style="padding:10px;">
+                            <img src="${f.download_url}" style="width:100%; height:100px; object-fit:cover; border-radius:4px; margin-bottom:10px;">
+                            <button class="btn btn-danger" style="width:100%; font-size:10px; padding:5px;" onclick="deleteFile('${f.path}', '${f.sha}')">DELETE</button>
+                        </div>
+                    `;
+                    grid.appendChild(div);
+                }
             });
-            setStatus(`Loaded ${images.length} images.`);
-
-        } catch (error) {
-            setStatus("Error loading gallery. Check token/path.", true);
-        }
+        } catch(e) { grid.innerHTML = 'No images found or path invalid.'; }
     }
 
-    // 3. Delete Function
-    async function deleteFile(fileName, sha) {
-        if (!confirm(`Are you sure you want to delete ${fileName}?`)) return;
-
-        const token = document.getElementById('token').value;
-        setStatus(`Deleting ${fileName}...`);
-
-        const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FOLDER_PATH}/${fileName}`;
-
+    async function deleteFile(path, sha) {
+        if(!confirm("Delete this file?")) return;
         try {
-            const response = await fetch(url, {
+            await fetch(`${API_BASE}/${CONFIG.owner}/${CONFIG.repo}/contents/${path}`, {
                 method: 'DELETE',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: `Delete ${fileName}`,
-                    sha: sha // GitHub requires the SHA to delete
-                })
+                headers: getHeaders(),
+                body: JSON.stringify({ message: "Delete Asset", sha: sha })
             });
+            showToast("File Deleted");
+            loadGallery();
+        } catch(e) { showToast("Delete Failed"); }
+    }
 
-            if (response.ok) {
-                setStatus("File deleted.");
-                loadGallery(); // Refresh list
-            } else {
-                const err = await response.json();
-                setStatus(`Delete failed: ${err.message}`, true);
-            }
-        } catch (error) {
-            setStatus("Network error during delete", true);
-        }
+    // --- HELPER: GENERIC UPLOAD ---
+    async function uploadFileToGitHub(path, content, msg, sha) {
+        const b64 = window.btoa(unescape(encodeURIComponent(content)));
+        const url = `${API_BASE}/${CONFIG.owner}/${CONFIG.repo}/contents/${path}`;
+        
+        const res = await fetch(url, {
+            method: 'PUT',
+            headers: getHeaders(),
+            body: JSON.stringify({
+                message: msg,
+                content: b64,
+                sha: sha
+            })
+        });
+
+        if(!res.ok) throw new Error("GitHub rejected the update");
+        
+        const data = await res.json();
+        STATE.sha = data.content.sha;
+        showToast("✅ SUCCESS! Changes Published.");
+        
+        // Reload parsing to ensure sync
+        setTimeout(() => loadSiteData(), 1000);
+    }
+
+    // --- UTILS ---
+    function saveToken() { localStorage.setItem('bt_token', document.getElementById('gh-token').value); }
+    
+    function saveConfig() {
+        CONFIG.owner = document.getElementById('cfg-owner').value;
+        CONFIG.repo = document.getElementById('cfg-repo').value;
+        CONFIG.path = document.getElementById('cfg-path').value;
+        CONFIG.gallery = document.getElementById('cfg-gal').value;
+        localStorage.setItem('bt_config', JSON.stringify(CONFIG));
+        updateLiveLink();
+        showToast("Settings Saved");
+    }
+
+    function switchTab(id) {
+        document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
+        
+        if(window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+        
+        // Context specific loads
+        if(id === 'tab-backups') loadCommits();
+        if(id === 'tab-gallery') loadGallery();
+    }
+    
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+    
+    function updateLiveLink() {
+        document.getElementById('live-link').href = `https://${CONFIG.owner}.github.io/${CONFIG.repo}/`;
     }
 </script>
 </body>
