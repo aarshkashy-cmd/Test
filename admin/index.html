@@ -533,76 +533,54 @@
     async function publishChanges() {
         showToast("Compiling & Uploading...", true);
 
-        // 1. Apply Text Changes
-        STATE.textNodes.forEach(item => {
-            const input = document.getElementById(`txt-${item.id}`);
-            if(input) item.node.nodeValue = input.value; // Keeps spacing check loose
-        });
-
-        // 2. Apply Animation Changes
-        STATE.animNodes.forEach(item => {
-            const type = document.getElementById(`anim-type-${item.idx}`).value;
-            const dur = document.getElementById(`anim-dur-${item.idx}`).value;
-            const del = document.getElementById(`anim-delay-${item.idx}`).value;
-            
-            item.el.setAttribute('data-aos', type);
-            item.el.setAttribute('data-aos-duration', dur);
-            item.el.setAttribute('data-aos-delay', del);
-        });
-
-        // 3. Apply CSS Changes
-        if(STATE.cssVars.length > 0) {
-            let newRoot = "";
-            STATE.cssVars.forEach((v, i) => {
-                const val = document.getElementById(`theme-val-${i}`).value;
-                newRoot += `${v.name}: ${val};\n`;
-            });
-            // Regex replace the root block
-            const regex = /:root\s*{([^}]+)}/;
-            let newCss = STATE.rawCss.replace(regex, `:root {\n${newRoot}}`);
-            
-            // Inject back into DOM
-            const styleTag = STATE.dom.querySelector('style');
-            if(styleTag) styleTag.textContent = newCss;
-        }
-
-        // 4. Serialize & Upload
-        const serializer = new XMLSerializer();
-        let finalHtml = "<!DOCTYPE html>\n" + serializer.serializeToString(STATE.dom);
-        
-        await uploadFileToGitHub(CONFIG.path, finalHtml, "Admin Panel Update", STATE.sha);
-    }
-
-    // --- FEATURE: TIME MACHINE (ROLLBACK) ---
-    async function loadCommits() {
-        showToast("Loading History...", true);
-        const list = document.getElementById('commits-list');
-        list.innerHTML = '';
-
         try {
-            const url = `${API_BASE}/${CONFIG.owner}/${CONFIG.repo}/commits?path=${CONFIG.path}&per_page=10`;
-            const res = await fetch(url, { headers: getHeaders() });
-            const commits = await res.json();
-
-            commits.forEach(c => {
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                div.innerHTML = `
-                    <div class="commit-meta">
-                        <span class="commit-msg">${c.commit.message}</span>
-                        <span class="commit-date">
-                            <span>${new Date(c.commit.author.date).toLocaleString()}</span>
-                            <span>• ${c.commit.author.name}</span>
-                        </span>
-                    </div>
-                    <button class="btn btn-secondary" style="font-size:10px;" onclick="revertToCommit('${c.sha}')">
-                        RESTORE
-                    </button>
-                `;
-                list.appendChild(div);
+            // 1. Apply Text Changes
+            STATE.textNodes.forEach(item => {
+                const input = document.getElementById(`txt-${item.id}`);
+                if(input) item.node.nodeValue = input.value; 
             });
-            showToast("History Loaded");
-        } catch(e) { showToast("Error loading history"); }
+
+            // 2. Apply Animation Changes
+            STATE.animNodes.forEach(item => {
+                const type = document.getElementById(`anim-type-${item.idx}`).value;
+                const dur = document.getElementById(`anim-dur-${item.idx}`).value;
+                const del = document.getElementById(`anim-delay-${item.idx}`).value;
+                
+                item.el.setAttribute('data-aos', type);
+                item.el.setAttribute('data-aos-duration', dur);
+                item.el.setAttribute('data-aos-delay', del);
+            });
+
+            // 3. Apply CSS Changes
+            if(STATE.cssVars.length > 0) {
+                let newRoot = "";
+                STATE.cssVars.forEach((v, i) => {
+                    const val = document.getElementById(`theme-val-${i}`).value;
+                    newRoot += `${v.name}: ${val};\n`;
+                });
+                const regex = /:root\s*{([^}]+)}/;
+                let newCss = STATE.rawCss.replace(regex, `:root {\n${newRoot}}`);
+                
+                const styleTag = STATE.dom.querySelector('style');
+                if(styleTag) styleTag.textContent = newCss;
+            }
+
+            // 4. Serialize & Upload (FIXED: Un-escapes JS symbols)
+            let finalHtml = "<!DOCTYPE html>\n" + STATE.dom.documentElement.outerHTML;
+            
+            // CRITICAL FIX: Restore > and < symbols inside script tags
+            finalHtml = finalHtml.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, function(match) {
+                return match.replace(/&lt;/g, '<')
+                            .replace(/&gt;/g, '>')
+                            .replace(/&amp;/g, '&');
+            });
+
+            await uploadFileToGitHub(CONFIG.path, finalHtml, "Admin Panel Update", STATE.sha);
+
+        } catch(e) {
+            showToast("Error: " + e.message);
+            console.error(e);
+        }
     }
 
     async function revertToCommit(commitSha) {
