@@ -1,101 +1,186 @@
 <!DOCTYPE html>
-<html lang="ml"><head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Screws &amp; Fasteners | Business Name</title>
+    <title>Screws & Fasteners | Premium Quality SDS</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+    </style>
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="bg-gray-50 font-sans text-gray-800">
 
     <header class="bg-white shadow-md sticky top-0 z-50">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <div class="flex items-center">
-                <div class="w-12 h-12 bg-blue-600 rounded flex items-center justify-center text-white font-bold mr-3">LOGO</div>
-                <h1 class="text-xl font-bold text-gray-800 tracking-tight">Bolthex</h1>
+                <div class="w-10 h-10 bg-blue-700 rounded flex items-center justify-center text-white font-bold mr-3 italic">SF</div>
+                <h1 class="text-2xl font-black text-blue-900 tracking-tighter">SCREW<span class="text-orange-500">FAST</span></h1>
             </div>
-            <nav class="hidden md:flex space-x-8 font-medium text-gray-600">
-                <a href="#home" class="hover:text-blue-600">Home</a>
-                <a href="#about" class="hover:text-blue-600">About</a>
-                <a href="#products" class="hover:text-blue-600">Products</a>
-                <a href="#contact" class="hover:text-blue-600">Contact</a>
+            
+            <nav class="hidden md:flex space-x-8 font-semibold text-gray-700">
+                <a href="#home" class="hover:text-blue-600 transition">Home</a>
+                <a href="#about" class="hover:text-blue-600 transition">About</a>
+                <a href="#products" class="hover:text-blue-600 transition">Products</a>
+                <a href="#contact" class="hover:text-blue-600 transition">Contact</a>
             </nav>
+            
+            <a href="#contact" class="bg-blue-700 text-white px-5 py-2 rounded shadow hover:bg-blue-800 transition hidden md:block">Get Quote</a>
         </div>
     </header>
 
-    <section id="home" class="bg-blue-900 text-white py-20 px-6 text-center">
-        <h2 class="text-4xl md:text-5xl font-bold mb-4">High-Quality Self Drilling Screws</h2>
-        <p class="text-lg mb-8 text-blue-100">Strong, Durable, and Reliable Fastening Solutions.</p>
-        <a href="#contact" class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-full font-bold">Enquire Now</a>
+    <section id="home" class="relative bg-gray-900 h-[500px] flex items-center justify-center text-center text-white">
+        <div class="absolute inset-0 bg-black opacity-50"></div>
+        <div class="relative z-10 px-6">
+            <h2 class="text-4xl md:text-6xl font-bold mb-4 uppercase tracking-wide">High-Performance <br> Self Drilling Screws</h2>
+            <p class="text-lg md:text-xl mb-8 text-gray-300 max-w-2xl mx-auto">Precision engineered fasteners for roofing, metal-to-metal, and heavy-duty construction works.</p>
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <a href="#products" class="bg-orange-500 hover:bg-orange-600 text-white px-10 py-3 rounded font-bold text-lg">View Products</a>
+                <a href="#contact" class="bg-white hover:bg-gray-200 text-blue-900 px-10 py-3 rounded font-bold text-lg">Enquire Now</a>
+            </div>
+        </div>
     </section>
 
-    <section id="about" class="py-16 px-6 container mx-auto text-center">
-        <h3 class="text-3xl font-bold mb-6">About Us</h3>
-        <p class="text-gray-600 max-w-2xl mx-auto leading-relaxed">We provide premium-quality self-drilling screws for the market. We offer high-grade screws specifically designed for construction, roofing, and various industrial applications.</p>
+    <section id="about" class="py-20 px-6 container mx-auto">
+        <div class="flex flex-col md:flex-row items-center gap-12">
+            <div class="md:w-1/2">
+                <h3 class="text-blue-900 font-bold uppercase tracking-widest text-sm mb-2">Our Story</h3>
+                <h2 class="text-3xl md:text-4xl font-bold mb-6">Providing Stronger Foundations Since [Year]</h2>
+                <p class="text-gray-600 leading-relaxed mb-4">
+                    We are a leading supplier of high-quality **Self-Drilling Screws (SDS)**. Our products are designed to penetrate hard metals and woods with ease, eliminating the need for pre-drilling.
+                </p>
+                <p class="text-gray-600 leading-relaxed">
+                    Durability and precision are at the heart of what we do. All our fasteners are tested for strength, corrosion resistance, and long-term reliability.
+                </p>
+            </div>
+            <div class="md:w-1/2 bg-gray-200 h-64 w-full rounded-lg flex items-center justify-center text-gray-400 italic">
+                [Insert Company Photo or Warehouse Image Here]
+            </div>
+        </div>
     </section>
 
-    <section id="products" class="py-16 bg-gray-100 px-6">
+    <section id="products" class="py-20 bg-gray-100 px-6">
         <div class="container mx-auto">
-            <h3 class="text-3xl font-bold text-center mb-10">Our Products</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-4 rounded-lg shadow">
-                    <div class="h-48 bg-gray-200 mb-4 rounded flex items-center justify-center text-gray-400">[Add Product Image]</div>
-                    <h4 class="font-bold text-lg">Roofing Screw</h4>
-                    <p class="text-gray-500 text-sm mb-4">Zinc coated, long life self-drilling screws for roofing.</p>
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Our Product Catalog</h2>
+                <div class="w-24 h-1 bg-orange-500 mx-auto"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition">
+                    <div class="h-56 bg-white flex items-center justify-center p-4 border-b">
+                        <img src="https://via.placeholder.com/250x200?text=Roofing+Screw" alt="Roofing Screw" class="max-h-full">
+                    </div>
+                    <div class="p-6">
+                        <h4 class="font-bold text-xl mb-2 text-blue-900">Hex Head Roofing Screw</h4>
+                        <p class="text-gray-600 text-sm mb-4">Comes with EPDM washers to prevent leaks. Zinc coated for anti-rust protection.</p>
+                        <a href="#contact" class="text-orange-500 font-bold hover:underline italic">Request Details →</a>
+                    </div>
                 </div>
-                <div class="bg-white p-4 rounded-lg shadow">
-                    <div class="h-48 bg-gray-200 mb-4 rounded flex items-center justify-center text-gray-400">[Add Product Image]</div>
-                    <h4 class="font-bold text-lg">SDS Wood Screw</h4>
-                    <p class="text-gray-500 text-sm mb-4">Perfect for heavy duty timber and wood works.</p>
+
+                <div class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition">
+                    <div class="h-56 bg-white flex items-center justify-center p-4 border-b">
+                        <img src="https://via.placeholder.com/250x200?text=SDS+Wood+Screw" alt="Wood Screw" class="max-h-full">
+                    </div>
+                    <div class="p-6">
+                        <h4 class="font-bold text-xl mb-2 text-blue-900">SDS Wood Screws</h4>
+                        <p class="text-gray-600 text-sm mb-4">Specially designed threads for high-grip strength in timber and hardwood applications.</p>
+                        <a href="#contact" class="text-orange-500 font-bold hover:underline italic">Request Details →</a>
+                    </div>
                 </div>
-                <div class="bg-white p-4 rounded-lg shadow">
-                    <div class="h-48 bg-gray-200 mb-4 rounded flex items-center justify-center text-gray-400">[Add Product Image]</div>
-                    <h4 class="font-bold text-lg">Drywall Screw</h4>
-                    <p class="text-gray-500 text-sm mb-4">Sharp point and durable material for interior works.</p>
+
+                <div class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition">
+                    <div class="h-56 bg-white flex items-center justify-center p-4 border-b">
+                        <img src="https://via.placeholder.com/250x200?text=Wafer+Head+Screw" alt="Wafer Head" class="max-h-full">
+                    </div>
+                    <div class="p-6">
+                        <h4 class="font-bold text-xl mb-2 text-blue-900">Wafer Head Screws</h4>
+                        <p class="text-gray-600 text-sm mb-4">Low profile head ideal for cabinet making and light metal framing.</p>
+                        <a href="#contact" class="text-orange-500 font-bold hover:underline italic">Request Details →</a>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="contact" class="py-16 px-6 container mx-auto">
-        <h3 class="text-3xl font-bold text-center mb-10">Send Enquiry</h3>
-        <div class="max-w-lg mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-            <form id="enquiryForm">
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Name</label>
-                    <input type="text" id="name" class="w-full border p-3 rounded focus:outline-blue-500" placeholder="Your Name" required="">
+    <section id="contact" class="py-20 px-6 container mx-auto">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="md:w-1/3 bg-blue-900 p-10 text-white">
+                <h3 class="text-2xl font-bold mb-6">Contact Info</h3>
+                <div class="space-y-6">
+                    <div>
+                        <p class="text-blue-300 text-sm">Our Address</p>
+                        <p>123 Industrial Area, Your City, State</p>
+                    </div>
+                    <div>
+                        <p class="text-blue-300 text-sm">Call Us</p>
+                        <p>+91 98765 43210</p>
+                    </div>
+                    <div>
+                        <p class="text-blue-300 text-sm">Email Us</p>
+                        <p>sales@yourbusiness.com</p>
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Product Interested</label>
-                    <select id="product" class="w-full border p-3 rounded focus:outline-blue-500">
-                        <option>Roofing Screw</option>
-                        <option>SDS Wood Screw</option>
-                        <option>Drywall Screw</option>
+            </div>
+
+            <div class="md:w-2/3 p-10">
+                <h3 class="text-2xl font-bold mb-6">Send an Enquiry</h3>
+                <form id="enquiryForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" id="name" placeholder="Full Name" class="w-full border-2 border-gray-100 p-3 rounded-lg focus:border-blue-500 outline-none" required>
+                        <input type="text" id="phone" placeholder="Phone Number" class="w-full border-2 border-gray-100 p-3 rounded-lg focus:border-blue-500 outline-none" required>
+                    </div>
+                    <select id="product" class="w-full border-2 border-gray-100 p-3 rounded-lg focus:border-blue-500 outline-none">
+                        <option value="General Enquiry">Select Product</option>
+                        <option value="Hex Roofing Screw">Hex Roofing Screw</option>
+                        <option value="SDS Wood Screw">SDS Wood Screw</option>
+                        <option value="Wafer Head Screw">Wafer Head Screw</option>
                     </select>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-gray-700 mb-2">Message</label>
-                    <textarea id="message" class="w-full border p-3 rounded h-32 focus:outline-blue-500" placeholder="Type your requirements..."></textarea>
-                </div>
-                <button type="button" onclick="sendToWhatsApp()" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-bold flex items-center justify-center">Connect on WhatsApp</button>
-            </form>
+                    <textarea id="message" placeholder="Type your requirements here..." class="w-full border-2 border-gray-100 p-3 rounded-lg h-32 focus:border-blue-500 outline-none"></textarea>
+                    
+                    <button type="button" onclick="sendToWhatsApp()" class="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-lg font-bold text-lg flex items-center justify-center gap-2 shadow-lg">
+                        <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                        Inquire via WhatsApp
+                    </button>
+                </form>
+            </div>
         </div>
     </section>
 
-    <footer class="bg-gray-800 text-white py-10 text-center">
-        <p>© 2024 Fasten Tech. All Rights Reserved.</p>
-        <p class="text-gray-400 text-sm mt-2">Quality Screws | Fast Delivery | Best Price</p>
+    <footer class="bg-gray-900 text-white py-12 px-6">
+        <div class="container mx-auto text-center">
+            <h2 class="text-2xl font-bold mb-4 italic text-orange-500">SCREWFAST</h2>
+            <p class="text-gray-400 mb-6">Your Trusted Partner for Quality Fasteners and Hardware.</p>
+            <div class="flex justify-center space-x-6 mb-8 text-gray-300">
+                <a href="#home">Home</a>
+                <a href="#about">About</a>
+                <a href="#products">Products</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <p class="text-gray-500 text-sm">&copy; 2024 Your Business Name. All Rights Reserved.</p>
+        </div>
     </footer>
 
     <script>
         function sendToWhatsApp() {
             const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
             const product = document.getElementById('product').value;
             const message = document.getElementById('message').value;
-            const phoneNumber = "919000000000"; // Ivide ningalude Number nalkuka (with country code)
+            
+            // !! IMPORTANT: Replace with your actual phone number (including country code)
+            const myNumber = "918281505931"; 
 
-            const text = `Hello, I'm ${name}. I am interested in ${product}. %0A%0ADetails: ${message}`;
-            window.open(`https://wa.me/${phoneNumber}?text=${text}`, '_blank');
+            if(name === "" || phone === "") {
+                alert("Please fill in your Name and Phone Number");
+                return;
+            }
+
+            const whatsappText = `*New Enquiry Received*%0A%0A*Name:* ${name}%0A*Phone:* ${phone}%0A*Product:* ${product}%0A*Requirements:* ${message}`;
+            
+            const link = `https://wa.me/${myNumber}?text=${whatsappText}`;
+            window.open(link, '_blank');
         }
     </script>
-
-</body></html>
+</body>
+</html>
