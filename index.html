@@ -1,80 +1,346 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BOLTHEX | Self Drilling Screws</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        /* --- 1. CSS VARIABLES (Theme Color System) --- */
+        :root {
+            /* Change these codes to change the website theme */
+            --primary-color: #ff6600; /* Orange Theme */
+            --secondary-color: #333333;
+            --text-color: #555555;
+            --light-bg: #f4f4f4;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            color: var(--text-color);
+        }
+
+        /* --- Navigation --- */
+        header {
+            background: var(--secondary-color);
+            color: #fff;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            /* Admin can replace this text with an <img> tag later */
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav ul li a:hover {
+            color: var(--primary-color);
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            background-color: var(--light-bg);
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .hero h1 {
+            color: var(--secondary-color);
+            font-size: 3rem;
+        }
+
+        .btn {
+            background: var(--primary-color);
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        /* --- Products Section --- */
+        .section-title {
+            text-align: center;
+            color: var(--secondary-color);
+            margin: 40px 0 20px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #ddd; /* Placeholder color */
+        }
+
+        /* --- Screw Size Chart (5 Columns) --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* --- Gallery --- */
+        .gallery img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+        /* --- Enquiry Form --- */
+        .form-box {
+            max-width: 600px;
+            margin: auto;
+            background: var(--light-bg);
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background: #25D366; /* WhatsApp Green */
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background: #1ebc57;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background: var(--secondary-color);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+        }
+
+    </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="logo">BOLTHEX</div>
-        <ul class="nav-links">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#products">Products</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-    </nav>
+    <header>
+        <div class="container">
+            <div class="logo">BOLTHEX</div>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#products">Products</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
     <section id="home" class="hero">
-        <h1>High-Quality Self Drilling Screws</h1>
-        <p>Reliable fastening solutions for your construction needs.</p>
-        <a href="#products" class="btn">View Products</a>
+        <div class="container">
+            <h1>Premium Self Drilling Screws</h1>
+            <p>High quality fastening solutions for industrial and home needs.</p>
+            <a href="#products" class="btn">View Products</a>
+        </div>
+    </section>
+
+    <section id="about" class="container">
+        <h2 class="section-title">About BOLTHEX</h2>
+        <p style="text-align: center; max-width: 800px; margin: auto;">
+            BOLTHEX is a leading manufacturer and supplier of self-drilling screws. 
+            We provide durable, rust-resistant, and precision-engineered screws for all construction needs.
+        </p>
     </section>
 
     <section id="products" class="container">
-        <h2>Our Product Range</h2>
-        <table class="size-chart">
+        <h2 class="section-title">Our Products</h2>
+        <div class="grid-container">
+            <div class="card">
+                <img src="https://via.placeholder.com/300?text=Hex+Head+Screw" alt="Screw">
+                <h3>Hex Head Screw</h3>
+                <p>Size: 19mm - 100mm</p>
+            </div>
+            <div class="card">
+                <img src="https://via.placeholder.com/300?text=CSK+Head+Screw" alt="Screw">
+                <h3>CSK Head Screw</h3>
+                <p>Size: 13mm - 75mm</p>
+            </div>
+            <div class="card">
+                <img src="https://via.placeholder.com/300?text=Truss+Head" alt="Screw">
+                <h3>Truss Head Screw</h3>
+                <p>Size: 13mm - 50mm</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <h2 class="section-title">Screw Size Chart</h2>
+        <table>
             <thead>
                 <tr>
-                    <th>Screw Type</th>
-                    <th>Size (mm)</th>
-                    <th>Head Style</th>
-                    <th>Drill Point</th>
+                    <th>Model No</th>
+                    <th>Diameter (mm)</th>
+                    <th>Length (mm)</th>
+                    <th>Head Type</th>
                     <th>Material</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Hex Head SDS</td>
-                    <td>12 x 25</td>
-                    <td>Hexagon</td>
-                    <td>#3 Point</td>
-                    <td>Zinc Plated</td>
+                    <td>SD-001</td>
+                    <td>4.2</td>
+                    <td>13 - 50</td>
+                    <td>Hex Washer</td>
+                    <td>Stainless Steel</td>
                 </tr>
                 <tr>
-                    <td>Wafer Head SDS</td>
-                    <td>10 x 19</td>
-                    <td>Flat Wafer</td>
-                    <td>#2 Point</td>
-                    <td>Stainless Steel</td>
+                    <td>SD-002</td>
+                    <td>4.8</td>
+                    <td>19 - 75</td>
+                    <td>Countersunk</td>
+                    <td>Carbon Steel</td>
+                </tr>
+                <tr>
+                    <td>SD-003</td>
+                    <td>5.5</td>
+                    <td>25 - 100</td>
+                    <td>Pan Head</td>
+                    <td>Zinc Plated</td>
                 </tr>
             </tbody>
         </table>
     </section>
 
-    <section id="contact" class="enquiry-section">
-        <h2>Send an Enquiry</h2>
-        <form class="enquiry-form">
-            <input type="text" id="name" placeholder="Your Name" required="">
-            <input type="text" id="product" placeholder="Product Interest" required="">
-            <textarea id="message" placeholder="Details about your order"></textarea>
-            <button type="button" onclick="sendToWhatsApp()" class="whatsapp-btn">Connect via WhatsApp</button>
-        </form>
+    <section class="container">
+        <h2 class="section-title">Gallery</h2>
+        <div class="grid-container gallery">
+            <img src="https://via.placeholder.com/300?text=Site+Work" alt="Gallery 1">
+            <img src="https://via.placeholder.com/300?text=Factory" alt="Gallery 2">
+            <img src="https://via.placeholder.com/300?text=Stock" alt="Gallery 3">
+            <img src="https://via.placeholder.com/300?text=Packing" alt="Gallery 4">
+        </div>
     </section>
 
-    <script>
-        function sendToWhatsApp() {
-            const name = document.getElementById('name').value;
-            const product = document.getElementById('product').value;
-            const msg = document.getElementById('message').value;
-            const phone = "918597997297"; // Replace with your actual WhatsApp number
+    <section id="contact" class="container">
+        <h2 class="section-title">Enquiry / Contact Us</h2>
+        <div class="form-box">
+            <input type="text" id="name" placeholder="Your Name">
+            <input type="text" id="phone" placeholder="Phone Number">
+            <select id="productType">
+                <option value="General">Select Product</option>
+                <option value="Hex Screw">Hex Screw</option>
+                <option value="CSK Screw">CSK Screw</option>
+            </select>
+            <textarea id="message" rows="4" placeholder="Your Message or Quantity"></textarea>
+            <button onclick="sendWhatsApp()">Send via WhatsApp</button>
+        </div>
+    </section>
 
-            const url = `https://wa.me/${phone}?text=Name: ${name}%0AProduct: ${product}%0ADetails: ${msg}`;
-            window.open(url, '_blank');
+    <footer>
+        <p>BOLTHEX Industries &copy; 2026</p>
+        <p>Location: Kerala, India | Phone: +91 98765 43210</p>
+    </footer>
+
+    <script>
+        function sendWhatsApp() {
+            // 1. Get values from the form
+            var name = document.getElementById("name").value;
+            var phone = document.getElementById("phone").value;
+            var product = document.getElementById("productType").value;
+            var message = document.getElementById("message").value;
+
+            // 2. Validate
+            if(name === "" || phone === "") {
+                alert("Please enter Name and Phone number");
+                return;
+            }
+
+            // 3. Create the WhatsApp URL
+            // Replace 918281505931 with your actual Admin WhatsApp number
+            var adminNumber = "918547997297"; 
+            
+            var url = "https://wa.me/" + adminNumber + "?text=" 
+            + "*Enquiry from BOLTHEX Website*" + "%0a"
+            + "Name: " + name + "%0a"
+            + "Phone: " + phone + "%0a"
+            + "Product: " + product + "%0a"
+            + "Message: " + message;
+
+            // 4. Open WhatsApp
+            window.open(url, '_blank').focus();
         }
     </script>
-
-</body></html>
+</body>
+</html>
